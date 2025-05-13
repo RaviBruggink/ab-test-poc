@@ -6,7 +6,7 @@
 Proof of Concept voor A/B Testing binnen **Aurora**, ontwikkeld tijdens een stage bij **Moonly Software**.  
 Vergelijk AI-modellen binnen specifieke use cases en stem live op de beste output!
 
----
+
 
 ## 📋 Inhoudsopgave
 - [Demo]
@@ -16,7 +16,7 @@ Vergelijk AI-modellen binnen specifieke use cases en stem live op de beste outpu
 - [Toekomstige Uitbreidingen]
 - [Over]
 
----
+
 
 ## 🖥️ Demo
 
@@ -31,7 +31,7 @@ In de applicatie kun je:
 - Stemmen op het beste antwoord  
 Live resultaten worden weergegeven in een dynamische **Chart.js** grafiek, met opties voor filters en een **colorblind-vriendelijke modus**.
 
----
+
 
 ## ⚙️ Installatie
 
@@ -80,7 +80,7 @@ EXIT;
 ./vendor/bin/sail artisan migrate:fresh --seed
 ```
 
----
+
 
 ## 🧪 Gebruik
 
@@ -90,7 +90,7 @@ EXIT;
 - Stem eenvoudig door op de beste output te klikken.
 - Bekijk real-time grafieken en filteropties.
 
----
+
 
 ## 🛠️ Handige Artisan Commands
 
@@ -108,7 +108,7 @@ EXIT;
 ./vendor/bin/sail artisan
 ```
 
----
+
 
 ## 🌟 Toekomstige Uitbreidingen
 
@@ -117,12 +117,12 @@ EXIT;
 - Admin dashboard voor modelbeheer
 - API-koppelingen naar echte AI systemen
 
----
+
 
 ## 🏢 Over
 
 Ontwikkeld binnen mijn stageproject bij **Moonly Software**.  
 
----
+
 
 > © 2025 Moonly Software
