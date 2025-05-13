@@ -1,8 +1,7 @@
 # Moonly A/B Test POC 🚀
 
-[![Laravel](https://img.shields.io/badge/Laravel-10-red)](https://laravel.com/)
+[![Laravel](https://img.shields.io/badge/Laravel-12-red)](https://laravel.com/)
 [![Docker](https://img.shields.io/badge/Docker-Enabled-blue)](https://www.docker.com/)
-[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 Proof of Concept voor A/B Testing binnen **Aurora**, ontwikkeld tijdens een stage bij **Moonly Software**.  
 Vergelijk AI-modellen binnen specifieke use cases en stem live op de beste output!
@@ -10,12 +9,12 @@ Vergelijk AI-modellen binnen specifieke use cases en stem live op de beste outpu
 ---
 
 ## 📋 Inhoudsopgave
-- [Demo](#demo)
-- [Installatie](#installatie)
-- [Gebruik](#gebruik)
-- [Handige Artisan Commands](#handige-artisan-commands)
-- [Toekomstige Uitbreidingen](#toekomstige-uitbreidingen)
-- [Over](#over)
+- [Demo]
+- [Installatie]
+- [Gebruik]
+- [Handige Artisan Commands]
+- [Toekomstige Uitbreidingen]
+- [Over]
 
 ---
 
