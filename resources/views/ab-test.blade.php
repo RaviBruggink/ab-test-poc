@@ -3,47 +3,61 @@
 
         <div class="max-w-5xl mx-auto">
 
-            <!-- Section: Pagina Titel -->
-            <h1 class="text-3xl font-bold text-gray-800 mb-8">Start een A/B Test</h1>
+            <!-- Titel -->
+            <h1 class="text-3xl font-bold text-gray-800 mb-8">
+                @if (isset($distribution))
+                    A/B Test: {{ $distribution->bot_name }} vs Gekozen Model
+                @else
+                    Start een A/B Test
+                @endif
+            </h1>
 
-            <!-- Section: Succesbericht -->
+            <!-- Succesbericht -->
             @if (session('success'))
                 <div class="mb-6 p-4 bg-green-100 text-green-800 rounded-lg shadow-sm">
                     {{ session('success') }}
                 </div>
             @endif
 
-            <!-- Section: A/B Test Formulier -->
+            <!-- Info bij distributie -->
+            @if (isset($distribution))
+                <div class="mb-8 p-4 bg-purple-100 rounded-lg text-purple-800">
+                    Je test nu bot <strong>{{ $distribution->bot_name }}</strong> voor de use case <strong>{{ $distribution->useCase->name }}</strong> tegen een ander gekozen model.
+                </div>
+            @endif
+
+            <!-- Formulier -->
             <form id="voteForm" method="POST" action="/vote" class="space-y-10">
                 @csrf
 
-                <!-- Section: Use Case Selectie -->
-                <div>
-                    <label for="use_case_select" class="block text-sm font-medium text-gray-700 mb-2">
-                        Kies een Use Case:
-                    </label>
-                    <select 
-                        name="use_case" 
-                        id="use_case_select" 
-                        required
-                        class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400"
-                    >
-                        @foreach (config('models.use_cases') as $useCase)
-                            <option value="{{ $useCase }}" {{ old('use_case') === $useCase ? 'selected' : '' }}>
-                                {{ $useCase }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+                <!-- Hidden inputs -->
+                @if (isset($distribution))
+                    <input type="hidden" name="distribution_id" value="{{ $distribution->id }}">
+                    <input type="hidden" name="use_case" value="{{ $distribution->useCase->name }}">
+                    <input type="hidden" id="model_a_select" value="{{ $models[0]['label'] }}">
+                @else
+                    <div>
+                        <label for="use_case_select" class="block text-sm font-medium text-gray-700 mb-2">
+                            Kies een Use Case:
+                        </label>
+                        <select 
+                            name="use_case" 
+                            id="use_case_select" 
+                            required
+                            class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        >
+                            @foreach (config('models.use_cases') as $useCase)
+                                <option value="{{ $useCase }}" {{ old('use_case') === $useCase ? 'selected' : '' }}>
+                                    {{ $useCase }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
 
-                <!-- Hidden Input: Gekozen Model -->
-                <input type="hidden" name="chosen_model" id="chosen_model_input">
-
-                <!-- Section: Modellen Vergelijking -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-
-                    <!-- Card: Model A -->
-                    <div class="space-y-4">
+                    <div>
+                        <label for="model_a_select" class="block text-sm font-medium text-gray-700 mb-2">
+                            Kies Model A:
+                        </label>
                         <select 
                             id="model_a_select" 
                             required
@@ -55,43 +69,56 @@
                                 </option>
                             @endforeach
                         </select>
+                    </div>
+                @endif
 
+                <!-- Model B keuze ALTIJD -->
+                <div>
+                    <label for="model_b_select" class="block text-sm font-medium text-gray-700 mb-2">
+                        Kies Model B:
+                    </label>
+                    <select 
+                        id="model_b_select" 
+                        required
+                        class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+                    >
+                        @foreach (config('models.models') as $model)
+                            <option value="{{ $model['label'] }}" {{ old('model_b') === $model['label'] ? 'selected' : '' }}>
+                                {{ $model['label'] }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Gekozen model hidden -->
+                <input type="hidden" name="chosen_model" id="chosen_model_input">
+
+                <!-- A/B kaarten -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                    <!-- Kaart Model A -->
+                    <div class="space-y-4">
                         <button 
                             type="button" 
                             onclick="submitVote('A')"
-                            class="group relative w-full text-left p-6 bg-white rounded-2xl border border-gray-300 transition-all duration-200 hover:border-gray-400 hover:shadow-md hover:-translate-y-1 space-y-4"
+                            class="group relative w-full text-left p-6 bg-white rounded-2xl border border-gray-300 hover:shadow-md hover:-translate-y-1"
                         >
-                            <!-- Card Content: Model A -->
-                            <div class="flex items-center space-x-4">
+                            <div class="flex items-center space-x-4 mb-4">
                                 <div class="w-10 h-10 bg-purple-100 text-purple-600 flex items-center justify-center rounded-full font-bold">
                                     A
                                 </div>
                                 <div id="model_a_label" class="font-semibold text-lg text-gray-800">
-                                    Nova
+                                    {{ $models[0]['label'] }}
                                 </div>
                             </div>
 
-                            <!-- Card Text: Model A -->
-                            <div class="text-sm text-gray-600">
-                                Leuk om te horen dat DanceFest 3000 in volle gang is! Laten we eens kijken welke artiesten er nog moeten komen:
-                                <ul class="list-disc list-inside mt-2">
-                                    <li><strong>Mainstage:</strong>
-                                        <ul class="list-disc list-inside ml-4">
-                                            <li><span class="text-red-500">Quintino</span> (om 14:45 ophalen vanaf Eindhoven Airport)</li>
-                                            <li><span class="text-red-500">La Fuente</span> (start om 18:00)</li>
-                                            <li><span class="text-red-500">Atmozfears</span> (start om 20:00, komt met onbekende MC)</li>
-                                        </ul>
-                                    </li>
-                                    <li><strong>Techno:</strong>
-                                        <ul class="list-disc list-inside ml-4">
-                                            <li><span class="font-bold">Adam Beyer</span> (start om 18:00)</li>
-                                            <li><span class="text-red-500">Charlotte de Witte</span> (start om 20:00, technische dienst klaarzetten)</li>
-                                        </ul>
-                                    </li>
-                                </ul>
+                            <!-- Simulatie Output A -->
+                            <div class="text-gray-600 text-sm bg-gray-50 p-4 rounded-lg shadow-inner">
+                                <p><strong>Gebruiker:</strong> "Hoe ziet het weer eruit morgen in Amsterdam?"</p>
+                                <p class="mt-2"><strong>AI Antwoord:</strong> "Morgen wordt het bewolkt met lichte regen en 17°C, vergeet je paraplu niet!"</p>
                             </div>
 
-                            <!-- Hover Effect: Checkmark Model A -->
+                            <!-- Hover checkmark -->
                             <div class="hidden group-hover:flex absolute bottom-4 left-4">
                                 <div class="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs">
                                     ✓
@@ -100,56 +127,29 @@
                         </button>
                     </div>
 
-                    <!-- Card: Model B -->
+                    <!-- Kaart Model B -->
                     <div class="space-y-4">
-                        <select 
-                            id="model_b_select" 
-                            required
-                            class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
-                        >
-                            @foreach (config('models.models') as $model)
-                                <option value="{{ $model['label'] }}" {{ old('model_b') === $model['label'] ? 'selected' : '' }}>
-                                    {{ $model['label'] }}
-                                </option>
-                            @endforeach
-                        </select>
-
                         <button 
                             type="button" 
                             onclick="submitVote('B')"
-                            class="group relative w-full text-left p-6 bg-white rounded-2xl border border-gray-300 transition-all duration-200 hover:border-gray-400 hover:shadow-md hover:-translate-y-1 space-y-4"
+                            class="group relative w-full text-left p-6 bg-white rounded-2xl border border-gray-300 hover:shadow-md hover:-translate-y-1"
                         >
-                            <!-- Card Content: Model B -->
-                            <div class="flex items-center space-x-4">
+                            <div class="flex items-center space-x-4 mb-4">
                                 <div class="w-10 h-10 bg-green-100 text-green-600 flex items-center justify-center rounded-full font-bold">
                                     B
                                 </div>
                                 <div id="model_b_label" class="font-semibold text-lg text-gray-800">
-                                    Nova
+                                    (model keuze B)
                                 </div>
                             </div>
 
-                            <!-- Card Text: Model B -->
-                            <div class="text-sm text-gray-600">
-                                Leuk om te horen dat DanceFest 3000 in volle gang is! Laten we eens kijken welke artiesten er nog moeten komen:
-                                <ul class="list-disc list-inside mt-2">
-                                    <li><strong>Mainstage:</strong>
-                                        <ul class="list-disc list-inside ml-4">
-                                            <li><span class="text-red-500">Quintino</span> (om 14:45 ophalen vanaf Eindhoven Airport)</li>
-                                            <li><span class="text-red-500">La Fuente</span> (start om 18:00)</li>
-                                            <li><span class="text-red-500">Atmozfears</span> (start om 20:00, komt met onbekende MC)</li>
-                                        </ul>
-                                    </li>
-                                    <li><strong>Techno:</strong>
-                                        <ul class="list-disc list-inside ml-4">
-                                            <li><span class="font-bold">Adam Beyer</span> (start om 18:00)</li>
-                                            <li><span class="text-red-500">Charlotte de Witte</span> (start om 20:00, technische dienst klaarzetten)</li>
-                                        </ul>
-                                    </li>
-                                </ul>
+                            <!-- Simulatie Output B -->
+                            <div class="text-gray-600 text-sm bg-gray-50 p-4 rounded-lg shadow-inner">
+                                <p><strong>Gebruiker:</strong> "Hoe ziet het weer eruit morgen in Amsterdam?"</p>
+                                <p class="mt-2"><strong>AI Antwoord:</strong> "Verwacht regen in de ochtend en een drogere middag rond 18°C."</p>
                             </div>
 
-                            <!-- Hover Effect: Checkmark Model B -->
+                            <!-- Hover checkmark -->
                             <div class="hidden group-hover:flex absolute bottom-4 left-4">
                                 <div class="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs">
                                     ✓
@@ -159,39 +159,42 @@
                     </div>
 
                 </div>
+
             </form>
-        </div>
 
-        <!-- Script: Submit Vote -->
-        <script>
-            function submitVote(selected) {
-                const modelA = document.getElementById('model_a_select').value;
-                const modelB = document.getElementById('model_b_select').value;
-                const useCase = document.getElementById('use_case_select').value;
+            <!-- Script -->
+            <script>
+                function submitVote(selected) {
+                    const modelA = document.getElementById('model_a_select').value;
+                    const modelB = document.getElementById('model_b_select').value;
 
-                if (modelA === modelB) {
-                    alert('Model A en Model B mogen niet hetzelfde zijn.');
-                    return;
+                    if (modelA === modelB) {
+                        alert('Model A en Model B mogen niet hetzelfde zijn.');
+                        return;
+                    }
+
+                    const chosenModel = selected === 'A' ? modelA : modelB;
+                    document.getElementById('chosen_model_input').value = chosenModel;
+
+                    const voteForm = document.getElementById('voteForm');
+
+                    const aInput = document.createElement('input');
+                    aInput.type = 'hidden';
+                    aInput.name = 'model_a';
+                    aInput.value = modelA;
+                    voteForm.appendChild(aInput);
+
+                    const bInput = document.createElement('input');
+                    bInput.type = 'hidden';
+                    bInput.name = 'model_b';
+                    bInput.value = modelB;
+                    voteForm.appendChild(bInput);
+
+                    voteForm.submit();
                 }
+            </script>
 
-                const chosenModel = selected === 'A' ? modelA : modelB;
-                document.getElementById('chosen_model_input').value = chosenModel;
-
-                const aInput = document.createElement('input');
-                aInput.type = 'hidden';
-                aInput.name = 'model_a';
-                aInput.value = modelA;
-                document.getElementById('voteForm').appendChild(aInput);
-
-                const bInput = document.createElement('input');
-                bInput.type = 'hidden';
-                bInput.name = 'model_b';
-                bInput.value = modelB;
-                document.getElementById('voteForm').appendChild(bInput);
-
-                document.getElementById('voteForm').submit();
-            }
-        </script>
+        </div>
 
     </section>
 </x-layout>

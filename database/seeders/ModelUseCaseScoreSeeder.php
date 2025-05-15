@@ -3,9 +3,11 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\ModelScore;
+use App\Models\AiModel;
+use App\Models\UseCase;
+use App\Models\ModelUseCaseScore;
 
-class ModelScoreSeeder extends Seeder
+class ModelUseCaseScoreSeeder extends Seeder
 {
     public function run(): void
     {
@@ -47,13 +49,29 @@ class ModelScoreSeeder extends Seeder
             ],
         ];
 
-        foreach ($modelScores as $model => $useCases) {
-            foreach ($useCases as $useCase => $score) {
-                ModelScore::create([
-                    'model_name' => $model,
-                    'use_case' => $useCase,
-                    'score' => $score,
-                ]);
+        foreach ($modelScores as $modelName => $useCases) {
+            $model = AiModel::where('name', $modelName)->first();
+
+            if (!$model) {
+                continue;
+            }
+
+            foreach ($useCases as $useCaseName => $score) {
+                $useCase = UseCase::where('name', $useCaseName)->first();
+
+                if (!$useCase) {
+                    continue;
+                }
+
+                ModelUseCaseScore::updateOrCreate(
+                    [
+                        'model_id' => $model->id,
+                        'use_case_id' => $useCase->id,
+                    ],
+                    [
+                        'score' => $score,
+                    ]
+                );
             }
         }
     }

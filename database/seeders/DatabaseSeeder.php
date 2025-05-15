@@ -9,7 +9,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            ModelScoreSeeder::class,
-        ]);
+            ModelSeeder::class,
+            UseCaseSeeder::class,
+            ModelUseCaseScoreSeeder::class,
+            DistributionSeeder::class,
+        ]);        
     }
 }

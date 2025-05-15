@@ -16,6 +16,7 @@
         <div class="flex gap-4">
             <a href="/" class="text-gray-700 hover:text-gray-900">A/B Test</a>
             <a href="/chart" class="text-gray-700 hover:text-gray-900">Resultaten</a>
+            <a href="/distributions" class="text-gray-700 hover:text-gray-900">Distributies</a>
         </div>
     </nav>
 
