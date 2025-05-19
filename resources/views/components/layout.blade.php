@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 text-gray-900">
+<body class="bg-white text-gray-900">
 
     <!-- Navbar -->
     <nav class="bg-white shadow p-4 flex justify-between items-center">

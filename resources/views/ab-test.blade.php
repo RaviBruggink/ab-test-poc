@@ -1,8 +1,111 @@
 <x-layout>
-    <section class="px-6 md:px-16 pt-20 min-h-screen">
-        <div class="max-w-5xl mx-auto">
+    <section class="px-20 pb-14 pt-5 min-h-screen">
+        <div class="mx-auto w-full">
 
-            <!-- Titel -->
+            <!-- User Message -->
+            <div class="p-6 bg-white rounded-[10px] flex flex-col sm:flex-row items-start gap-6 mb-10">
+                <img class="w-12 h-12 rounded-2xl" src="https://placehold.co/52x52" alt="Model A">
+                <div class="flex-1 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-neutral-700 text-lg font-bold">User</span>
+                        <p class="text-sm">13:31</p>
+                    </div>
+                    <div class="text-neutral-700 text-sm sm:text-base leading-relaxed space-y-1">
+                        <p>Hey, we zijn inmiddels vollop bezig met het adverteren van DanceFest 3000. Ik wil een poster gaan maken van de timetable. wat is de line-up?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- A/B Cards -->
+            <section class="flex flex-col lg:flex-row gap-6 pb-40">
+                <!-- Card A -->
+                <div onclick="submitVote('A')"
+                    class="lg:w-1/2 w-full p-6 bg-white rounded-[10px] flex flex-col sm:flex-row items-start gap-6 hover:bg-slate-50 hover:outline hover:outline-2 hover:outline-stone-300 hover:outline-offset-[-2px] transition-all cursor-pointer">
+                    <img class="w-12 h-12 rounded-2xl" src="https://placehold.co/52x52" alt="Model A">
+                    <div class="flex-1 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-neutral-700 text-lg font-bold">Nova</span>
+                            <span class="bg-neutral-100 px-4 py-1 rounded text-sm text-neutral-700">Response A</span>
+                        </div>
+                        <div class="text-neutral-700 text-sm sm:text-base leading-relaxed space-y-1">
+                            <p>Leuk om te horen dat DanceFest 3000 in volle gang is! Laten we eens kijken welke
+                                artiesten er nog moeten komen:</p>
+                            <p><strong>Mainstage:</strong></p>
+                            <ul class="list-disc pl-5">
+                                <li><span class="text-red-400 font-bold">Quintino</span> – 14:45 ophalen van Eindhoven
+                                    Airport</li>
+                                <li><span class="text-red-400 font-bold">La Fuente</span> – start om 18:00</li>
+                                <li><span class="text-red-400 font-bold">Atmozfears</span> – start om 20:00 (met
+                                    onbekende MC)</li>
+                            </ul>
+                            <p><strong>Techno:</strong></p>
+                            <ul class="list-disc pl-5">
+                                <li><strong>Adam Beyer</strong> – start om 18:00</li>
+                                <li><span class="text-red-400 font-bold">Charlotte de Witte</span> – start om 20:00,
+                                    technische dienst klaar half uur voor show</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card B -->
+                <div onclick="submitVote('B')"
+                    class="lg:w-1/2 w-full p-6 bg-white rounded-[10px] flex flex-col sm:flex-row items-start gap-6 hover:bg-slate-50 hover:outline hover:outline-2 hover:outline-stone-300 hover:outline-offset-[-2px] transition-all cursor-pointer">
+                    <img class="w-12 h-12 rounded-2xl" src="https://placehold.co/52x52" alt="Model B">
+                    <div class="flex-1 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-neutral-700 text-lg font-bold">Nova</span>
+                            <span class="bg-neutral-100 px-4 py-1 rounded text-sm text-neutral-700">Response B</span>
+                        </div>
+                        <div class="text-neutral-700 text-sm sm:text-base leading-relaxed space-y-1">
+                            <p>Leuk om te horen dat DanceFest 3000 in volle gang is! Laten we eens kijken welke
+                                artiesten er nog moeten komen:</p>
+                            <p><strong>Mainstage:</strong></p>
+                            <ul class="list-disc pl-5">
+                                <li><span class="text-red-400 font-bold">Quintino</span> – 14:45 ophalen van Eindhoven
+                                    Airport</li>
+                                <li><span class="text-red-400 font-bold">La Fuente</span> – start om 18:00</li>
+                                <li><span class="text-red-400 font-bold">Atmozfears</span> – start om 20:00 (met
+                                    onbekende MC)</li>
+                            </ul>
+                            <p><strong>Techno:</strong></p>
+                            <ul class="list-disc pl-5">
+                                <li><strong>Adam Beyer</strong> – start om 18:00</li>
+                                <li><span class="text-red-400 font-bold">Charlotte de Witte</span> – start om 20:00,
+                                    technische dienst klaar half uur voor show</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chat Input Fixed and Aligned Properly -->
+            <div class="fixed bottom-10 left-0 right-0 px-4">
+                <div class="max-w-screen-md mx-auto rounded-2xl px-4 py-3 bg-gray-50 shadow-sm border border-gray-200">
+                    <div class="flex items-center gap-2">
+                        <textarea x-data="chatInput" x-model="chatMessage" x-on:change="resize($el)"
+                            x-on:message-sent.window="resize($el)" x-ref="answer"
+                            @keydown.enter="if (!$event.shiftKey) { $event.preventDefault(); send() }"
+                            @keyup.enter="if ($event.shiftKey) { $event.preventDefault(); }" @input="resize($el)"
+                            placeholder="Start typing to chat..."
+                            class="w-full resize-none bg-transparent border-none focus:ring-0 text-gray-700 text-md"
+                            style="height: 28px; line-height: 1.5;"></textarea>
+                        <button @click="send()"
+                            class="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-send-icon lucide-send">
+                                <path
+                                    d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z" />
+                                <path d="m21.854 2.147-10.94 10.939" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Title -->
             <h1 class="text-3xl font-bold text-gray-800 mb-8">
                 @if (isset($distribution))
                     A/B Test: {{ $distribution->bot_name }} vs Gekozen Model
@@ -11,14 +114,14 @@
                 @endif
             </h1>
 
-            <!-- Succesbericht -->
+            <!-- Success Message -->
             @if (session('success'))
                 <div class="mb-6 p-4 bg-green-100 text-green-800 rounded-lg shadow-sm">
                     {{ session('success') }}
                 </div>
             @endif
 
-            <!-- Distributie-informatie -->
+            <!-- Info Box -->
             @if (isset($distribution))
                 <div class="mb-8 p-4 bg-purple-100 rounded-lg text-purple-800">
                     Je test nu bot <strong>{{ $distribution->bot_name }}</strong> voor de use case
@@ -26,17 +129,15 @@
                 </div>
             @endif
 
-            <!-- A/B Test Formulier -->
+            <!-- A/B Test Form -->
             <form id="voteForm" method="POST" action="/vote" class="space-y-10">
                 @csrf
 
-                <!-- Hidden inputs indien distributie bestaat -->
                 @if (isset($distribution))
                     <input type="hidden" name="distribution_id" value="{{ $distribution->id }}">
                     <input type="hidden" name="use_case" value="{{ $distribution->useCase->name }}">
                     <input type="hidden" id="model_a_select" value="{{ $models[0]['label'] }}">
                 @else
-                    <!-- Select Use Case -->
                     <div>
                         <label for="use_case_select" class="block text-sm font-medium text-gray-700 mb-2">
                             Kies een Use Case:
@@ -51,7 +152,6 @@
                         </select>
                     </div>
 
-                    <!-- Select Model A -->
                     <div>
                         <label for="model_a_select" class="block text-sm font-medium text-gray-700 mb-2">
                             Kies Model A:
@@ -67,7 +167,6 @@
                     </div>
                 @endif
 
-                <!-- Select Model B -->
                 <div>
                     <label for="model_b_select" class="block text-sm font-medium text-gray-700 mb-2">
                         Kies Model B:
@@ -82,128 +181,35 @@
                     </select>
                 </div>
 
-                <!-- Hidden gekozen model -->
                 <input type="hidden" name="chosen_model" id="chosen_model_input">
-
-                <!-- A/B Kaarten -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-
-                    <!-- Model A Kaart -->
-                    <div class="space-y-4">
-                        <button type="button" onclick="submitVote('A')"
-                            class="group relative w-full text-left p-6 bg-white rounded-2xl border border-gray-300 hover:shadow-md hover:-translate-y-1">
-
-                            <div class="flex items-center space-x-4 mb-4">
-                                <div class="w-10 h-10 bg-purple-100 text-purple-600 flex items-center justify-center rounded-full font-bold">
-                                    A
-                                </div>
-                                <div id="model_a_label" class="font-semibold text-lg text-gray-800">
-                                    {{ $models[0]['label'] }}
-                                </div>
-                            </div>
-
-                            <!-- Output tekst Model A -->
-                            <div class="text-gray-600 text-sm bg-gray-50 p-4 rounded-lg shadow-inner">
-                                <p class="mt-2">
-                                    Zeker! Laravel is een populair PHP-framework voor webontwikkeling dat gebruikmaakt van het MVC-patroon. Het biedt tools zoals:
-                                </p>
-                                <ul class="list-disc list-inside mt-4 space-y-1">
-                                    <li><span class="text-red-400 font-semibold">Eloquent ORM</span>: Voor eenvoudige database-interacties.</li>
-                                    <li><span class="text-red-400 font-semibold">Blade Templating Engine</span>: Voor het maken van dynamische webpagina's.</li>
-                                    <li><span class="text-red-400 font-semibold">Routing</span>: Voor het beheren van webverzoeken.</li>
-                                    <li><span class="text-red-400 font-semibold">Middleware</span>: Voor het implementeren van verzoekfilters.</li>
-                                    <li><span class="text-red-400 font-semibold">Migraties</span>: Voor databasebeheer en versiecontrole.</li>
-                                    <li><span class="text-red-400 font-semibold">Queues</span>: Voor taakverwerking op de achtergrond.</li>
-                                    <li><span class="text-red-400 font-semibold">Security</span>: Voor ingebouwde beveiligingsmaatregelen.</li>
-                                </ul>
-                                <p class="mt-4">
-                                    Laravel staat bekend om zijn elegante syntax, uitgebreide functionaliteiten en sterke community-ondersteuning, waardoor het een favoriete keuze is voor het bouwen van webapplicaties.
-                                </p>
-                            </div>
-
-                            <!-- Hover Checkmark -->
-                            <div class="hidden group-hover:flex absolute bottom-4 left-4">
-                                <div class="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs">
-                                    &#10003;
-                                </div>
-                            </div>
-                        </button>
-                    </div>
-
-                    <!-- Model B Kaart -->
-                    <div class="space-y-4">
-                        <button type="button" onclick="submitVote('B')"
-                            class="group relative w-full text-left p-6 bg-white rounded-2xl border border-gray-300 hover:shadow-md hover:-translate-y-1">
-
-                            <div class="flex items-center space-x-4 mb-4">
-                                <div class="w-10 h-10 bg-green-100 text-green-600 flex items-center justify-center rounded-full font-bold">
-                                    B
-                                </div>
-                                <div id="model_b_label" class="font-semibold text-lg text-gray-800">
-                                    (model keuze B)
-                                </div>
-                            </div>
-
-                            <!-- Output tekst Model B -->
-                            <div class="text-gray-600 text-sm bg-gray-50 p-4 rounded-lg shadow-inner">
-                                <p class="mt-2">
-                                    Zeker! Laravel is een krachtig PHP-framework voor webontwikkeling dat het MVC-patroon volgt. Hier zijn enkele belangrijke tools die het biedt:
-                                </p>
-                                <ul class="list-disc list-inside mt-4 space-y-1">
-                                    <li><span class="text-red-400 font-semibold">Eloquent ORM</span>: Voor eenvoudige interactie met databases.</li>
-                                    <li><span class="text-red-400 font-semibold">Blade Templating Engine</span>: Voor flexibele views en layouts.</li>
-                                    <li><span class="text-red-400 font-semibold">Routing</span>: Voor beheer van webverzoeken.</li>
-                                    <li><span class="text-red-400 font-semibold">Middleware</span>: Voor het filteren van HTTP-verzoeken.</li>
-                                    <li><span class="text-red-400 font-semibold">Migraties</span>: Voor versiebeheer van de database.</li>
-                                    <li><span class="text-red-400 font-semibold">Queues</span>: Voor taakverwerking in de achtergrond.</li>
-                                    <li><span class="text-red-400 font-semibold">Security</span>: Voor ingebouwde beveiliging van applicaties.</li>
-                                </ul>
-                                <p class="mt-4">
-                                    Laravel is populair vanwege zijn elegante syntax, krachtige features en een actieve community, wat het ideaal maakt voor moderne webapplicaties.
-                                </p>
-                            </div>
-
-                            <!-- Hover Checkmark -->
-                            <div class="hidden group-hover:flex absolute bottom-4 left-4">
-                                <div class="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs">
-                                    &#10003;
-                                </div>
-                            </div>
-                        </button>
-                    </div>
-
-                </div>
             </form>
-
-            <!-- Script: Afhandeling van votes -->
-            <script>
-                function submitVote(selected) {
-                    const modelA = document.getElementById('model_a_select').value;
-                    const modelB = document.getElementById('model_b_select').value;
-
-                    if (modelA === modelB) {
-                        alert('Model A en Model B mogen niet hetzelfde zijn.');
-                        return;
-                    }
-
-                    const chosenModel = selected === 'A' ? modelA : modelB;
-                    document.getElementById('chosen_model_input').value = chosenModel;
-
-                    const voteForm = document.getElementById('voteForm');
-
-                    // Voeg hidden inputs toe voor model_a en model_b
-                    ['model_a', 'model_b'].forEach(id => {
-                        const input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = id;
-                        input.value = id === 'model_a' ? modelA : modelB;
-                        voteForm.appendChild(input);
-                    });
-
-                    voteForm.submit();
-                }
-            </script>
-
         </div>
     </section>
+
+    <script>
+        function submitVote(selected) {
+            const modelA = document.getElementById('model_a_select').value;
+            const modelB = document.getElementById('model_b_select').value;
+
+            if (modelA === modelB) {
+                alert('Model A en Model B mogen niet hetzelfde zijn.');
+                return;
+            }
+
+            const chosenModel = selected === 'A' ? modelA : modelB;
+            document.getElementById('chosen_model_input').value = chosenModel;
+
+            const voteForm = document.getElementById('voteForm');
+
+            ['model_a', 'model_b'].forEach(id => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = id;
+                input.value = id === 'model_a' ? modelA : modelB;
+                voteForm.appendChild(input);
+            });
+
+            voteForm.submit();
+        }
+    </script>
 </x-layout>
