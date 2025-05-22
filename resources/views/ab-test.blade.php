@@ -2,84 +2,58 @@
     <section class="px-20 pb-14 pt-5 min-h-screen">
         <div class="mx-auto w-full">
 
-            <!-- User Message -->
-            <div class="p-6 bg-white rounded-[10px] flex flex-col sm:flex-row items-start gap-6 mb-10">
-                <img class="w-12 h-12 rounded-2xl" src="https://placehold.co/52x52" alt="Model A">
-                <div class="flex-1 space-y-3">
-                    <div class="flex justify-between items-center">
-                        <span class="text-neutral-700 text-lg font-bold">User</span>
-                        <p class="text-sm">13:31</p>
-                    </div>
-                    <div class="text-neutral-700 text-sm sm:text-base leading-relaxed space-y-1">
-                        <p>Hey, we zijn inmiddels vollop bezig met het adverteren van DanceFest 3000. Ik wil een poster gaan maken van de timetable. wat is de line-up?</p>
-                    </div>
-                </div>
-            </div>
+            {{-- Gebruikersbericht --}}
+            <x-chat.message 
+                avatar="https://placehold.co/52x52" 
+                name="User" 
+                time="13:31"
+                content="<p>Hey, we zijn inmiddels vollop bezig met het adverteren van DanceFest 3000. Ik wil een poster gaan maken van de timetable. wat is de line-up?</p>"
+            />
 
-            <!-- A/B Cards -->
+            {{-- A/B Cards --}}
             <section class="flex flex-col lg:flex-row gap-6 pb-40">
-                <!-- Card A -->
-                <div onclick="submitVote('A')"
-                    class="lg:w-1/2 w-full p-6 bg-white rounded-[10px] flex flex-col sm:flex-row items-start gap-6 hover:bg-slate-50 hover:outline hover:outline-2 hover:outline-stone-300 hover:outline-offset-[-2px] transition-all cursor-pointer">
-                    <img class="w-12 h-12 rounded-2xl" src="https://placehold.co/52x52" alt="Model A">
-                    <div class="flex-1 space-y-3">
-                        <div class="flex justify-between items-center">
-                            <span class="text-neutral-700 text-lg font-bold">Nova</span>
-                            <span class="bg-neutral-100 px-4 py-1 rounded text-sm text-neutral-700">Response A</span>
-                        </div>
-                        <div class="text-neutral-700 text-sm sm:text-base leading-relaxed space-y-1">
-                            <p>Leuk om te horen dat DanceFest 3000 in volle gang is! Laten we eens kijken welke
-                                artiesten er nog moeten komen:</p>
-                            <p><strong>Mainstage:</strong></p>
-                            <ul class="list-disc pl-5">
-                                <li><span class="text-red-400 font-bold">Quintino</span> – 14:45 ophalen van Eindhoven
-                                    Airport</li>
-                                <li><span class="text-red-400 font-bold">La Fuente</span> – start om 18:00</li>
-                                <li><span class="text-red-400 font-bold">Atmozfears</span> – start om 20:00 (met
-                                    onbekende MC)</li>
-                            </ul>
-                            <p><strong>Techno:</strong></p>
-                            <ul class="list-disc pl-5">
-                                <li><strong>Adam Beyer</strong> – start om 18:00</li>
-                                <li><span class="text-red-400 font-bold">Charlotte de Witte</span> – start om 20:00,
-                                    technische dienst klaar half uur voor show</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+                
+            @php
+            $cardContentA = '
+                <p><strong>Line-up voor DanceFest 3000:</strong></p>
 
-                <!-- Card B -->
-                <div onclick="submitVote('B')"
-                    class="lg:w-1/2 w-full p-6 bg-white rounded-[10px] flex flex-col sm:flex-row items-start gap-6 hover:bg-slate-50 hover:outline hover:outline-2 hover:outline-stone-300 hover:outline-offset-[-2px] transition-all cursor-pointer">
-                    <img class="w-12 h-12 rounded-2xl" src="https://placehold.co/52x52" alt="Model B">
-                    <div class="flex-1 space-y-3">
-                        <div class="flex justify-between items-center">
-                            <span class="text-neutral-700 text-lg font-bold">Nova</span>
-                            <span class="bg-neutral-100 px-4 py-1 rounded text-sm text-neutral-700">Response B</span>
-                        </div>
-                        <div class="text-neutral-700 text-sm sm:text-base leading-relaxed space-y-1">
-                            <p>Leuk om te horen dat DanceFest 3000 in volle gang is! Laten we eens kijken welke
-                                artiesten er nog moeten komen:</p>
-                            <p><strong>Mainstage:</strong></p>
-                            <ul class="list-disc pl-5">
-                                <li><span class="text-red-400 font-bold">Quintino</span> – 14:45 ophalen van Eindhoven
-                                    Airport</li>
-                                <li><span class="text-red-400 font-bold">La Fuente</span> – start om 18:00</li>
-                                <li><span class="text-red-400 font-bold">Atmozfears</span> – start om 20:00 (met
-                                    onbekende MC)</li>
-                            </ul>
-                            <p><strong>Techno:</strong></p>
-                            <ul class="list-disc pl-5">
-                                <li><strong>Adam Beyer</strong> – start om 18:00</li>
-                                <li><span class="text-red-400 font-bold">Charlotte de Witte</span> – start om 20:00,
-                                    technische dienst klaar half uur voor show</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+                <p><u>Mainstage:</u></p>
+                <ul class="list-disc pl-5">
+                    <li><span class="text-red-400 font-bold">Quintino</span> — aankomst om 14:45 (Eindhoven Airport)</li>
+                    <li><span class="text-red-400 font-bold">La Fuente</span> — optreden om 18:00</li>
+                    <li><span class="text-red-400 font-bold">Atmozfears</span> — optreden om 20:00 (MC nog niet bevestigd)</li>
+                </ul>
+
+                <p><u>Techno Area:</u></p>
+                <ul class="list-disc pl-5">
+                    <li><strong>Adam Beyer</strong> — vanaf 18:00</li>
+                    <li><strong>Charlotte de Witte</strong> — vanaf 20:00 (soundcheck gepland 30 min. vooraf)</li>
+                </ul>
+            ';
+
+            $cardContentB = '
+                <p>🔥 De line-up ziet er fantastisch uit! Hier is een sneak peek van wat je kunt verwachten:</p>
+
+                <p><strong>Mainstage Madness:</strong></p>
+                <ul class="list-disc pl-5">
+                    <li><span class="text-red-400 font-bold">Quintino</span> landt om 14:45 op Eindhoven Airport – klaar om de boel af te breken!</li>
+                    <li><span class="text-red-400 font-bold">La Fuente</span> zet alles op z’n kop om 18:00</li>
+                    <li><span class="text-red-400 font-bold">Atmozfears</span> sluit af om 20:00 – MC nog een verrassing 😉</li>
+                </ul>
+
+                <p><strong>Techno Tunnel:</strong></p>
+                <ul class="list-disc pl-5">
+                    <li><strong>Adam Beyer</strong> begint strak om 18:00</li>
+                    <li><strong>Charlotte de Witte</strong> ramt erin om 20:00 – techniek staat paraat vanaf 19:30</li>
+                </ul>
+            ';
+            @endphp
+
+                <x-chat.card variant="A" avatar="https://placehold.co/52x52" name="Nova" :content="$cardContentA" />
+                <x-chat.card variant="B" avatar="https://placehold.co/52x52" name="Nova" :content="$cardContentB" />
             </section>
 
-            <!-- Chat Input Fixed and Aligned Properly -->
+            {{-- Chat Input --}}
             <div class="fixed bottom-10 left-0 right-0 px-4">
                 <div class="max-w-screen-md mx-auto rounded-2xl px-4 py-3 bg-gray-50 shadow-sm border border-gray-200">
                     <div class="flex items-center gap-2">
@@ -95,8 +69,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" class="lucide lucide-send-icon lucide-send">
-                                <path
-                                    d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z" />
+                                <path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z" />
                                 <path d="m21.854 2.147-10.94 10.939" />
                             </svg>
                         </button>
@@ -104,8 +77,7 @@
                 </div>
             </div>
 
-
-            <!-- Title -->
+            {{-- Titel --}}
             <h1 class="text-3xl font-bold text-gray-800 mb-8">
                 @if (isset($distribution))
                     A/B Test: {{ $distribution->bot_name }} vs Gekozen Model
@@ -114,14 +86,14 @@
                 @endif
             </h1>
 
-            <!-- Success Message -->
+            {{-- Succesmelding --}}
             @if (session('success'))
                 <div class="mb-6 p-4 bg-green-100 text-green-800 rounded-lg shadow-sm">
                     {{ session('success') }}
                 </div>
             @endif
 
-            <!-- Info Box -->
+            {{-- Info Box --}}
             @if (isset($distribution))
                 <div class="mb-8 p-4 bg-purple-100 rounded-lg text-purple-800">
                     Je test nu bot <strong>{{ $distribution->bot_name }}</strong> voor de use case
@@ -129,7 +101,7 @@
                 </div>
             @endif
 
-            <!-- A/B Test Form -->
+            {{-- A/B Formulier --}}
             <form id="voteForm" method="POST" action="/vote" class="space-y-10">
                 @csrf
 
@@ -186,6 +158,7 @@
         </div>
     </section>
 
+    {{-- Vote script --}}
     <script>
         function submitVote(selected) {
             const modelA = document.getElementById('model_a_select').value;
