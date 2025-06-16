@@ -4,17 +4,17 @@
 
             {{-- Gebruikersbericht --}}
             <x-chat.message 
-                avatar="https://placehold.co/52x52" 
+                avatar="https://gravatar.com/avatar/27205e5c51cb03f862138b22bcb5dc20f94a342e744ff6df1b8dc8af3c865109?s=200" 
                 name="User" 
                 time="13:31"
-                content="<p>Hey, we zijn inmiddels vollop bezig met het adverteren van DanceFest 3000. Ik wil een poster gaan maken van de timetable. wat is de line-up?</p>" 
+                content="<p>Hey Nova, kan je me helpen? Ik zoek artiesten informatie voor Dancefest 3000</p>" 
             />
 
             {{-- A/B Cards --}}
             <section class="flex flex-col lg:flex-row gap-6 pb-40">
                 @php
                     $cardContentA = '
-                        <p><strong>Line-up voor DanceFest 3000:</strong></p>
+                        <p>Line-up voor DanceFest 3000:</p>
 
                         <p><u>Mainstage:</u></p>
                         <ul class="list-disc pl-5">
@@ -25,31 +25,31 @@
 
                         <p><u>Techno Area:</u></p>
                         <ul class="list-disc pl-5">
-                            <li><strong>Adam Beyer</strong> — vanaf 18:00</li>
-                            <li><strong>Charlotte de Witte</strong> — vanaf 20:00 (soundcheck gepland 30 min. vooraf)</li>
+                            <li>Adam Beyer — vanaf 18:00</li>
+                            <li>Charlotte de Witte — vanaf 20:00 (soundcheck gepland 30 min. vooraf)</li>
                         </ul>
                     ';
 
                     $cardContentB = '
-                        <p>🔥 De line-up ziet er fantastisch uit! Hier is een sneak peek van wat je kunt verwachten:</p>
+                        <p>De line-up ziet er fantastisch uit! Hier is een sneak peek van wat je kunt verwachten:</p>
 
-                        <p><strong>Mainstage Madness:</strong></p>
+                        <p>Mainstage Madness:</p>
                         <ul class="list-disc pl-5">
                             <li><span class="text-red-400 font-bold">Quintino</span> landt om 14:45 op Eindhoven Airport – klaar om de boel af te breken!</li>
                             <li><span class="text-red-400 font-bold">La Fuente</span> zet alles op z’n kop om 18:00</li>
-                            <li><span class="text-red-400 font-bold">Atmozfears</span> sluit af om 20:00 – MC nog een verrassing 😉</li>
+                            <li><span class="text-red-400 font-bold">Atmozfears</span> sluit af om 20:00 – MC nog een verrassing</li>
                         </ul>
 
-                        <p><strong>Techno Tunnel:</strong></p>
+                        <p>Techno Tunnel:</p>
                         <ul class="list-disc pl-5">
-                            <li><strong>Adam Beyer</strong> begint strak om 18:00</li>
-                            <li><strong>Charlotte de Witte</strong> ramt erin om 20:00 – techniek staat paraat vanaf 19:30</li>
+                            <li>Adam Beyer begint strak om 18:00</li>
+                            <li>Charlotte de Witte ramt erin om 20:00 – techniek staat paraat vanaf 19:30</li>
                         </ul>
                     ';
                 @endphp
 
-                <x-chat.card variant="A" avatar="https://placehold.co/52x52" name="Nova" :content="$cardContentA" />
-                <x-chat.card variant="B" avatar="https://placehold.co/52x52" name="Nova" :content="$cardContentB" />
+                <x-chat.card variant="A" avatar="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250" name="Nova" :content="$cardContentA" />
+                <x-chat.card variant="B" avatar="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250" name="Nova" :content="$cardContentB" />
             </section>
 
             {{-- Chat Input --}}
@@ -88,10 +88,10 @@
                     {{ session('success') }}
                 </div>
             @endif
+            
 
+            {{-- hidden voor presentatie demo --}}
             <section class="hidden">
-
-                {{-- Titel --}}
                 <h1 class="text-3xl font-bold text-gray-800 mb-8">
                     @if (isset($distribution))
                         A/B Test: {{ $distribution->bot_name }} vs Gekozen Model
@@ -99,12 +99,11 @@
                         Start een A/B Test
                     @endif
                 </h1>
-
-                {{-- Info Box --}}
+                
                 @if (isset($distribution))
                     <div class="mb-8 p-4 bg-purple-100 rounded-lg text-purple-800">
-                        Je test nu bot <strong>{{ $distribution->bot_name }}</strong> voor de use case
-                        <strong>{{ $distribution->useCase->name }}</strong> tegen een ander gekozen model.
+                        Je test nu bot {{ $distribution->bot_name }} voor de use case
+                        {{ $distribution->useCase->name }} tegen een ander gekozen model.
                     </div>
                 @endif
 
