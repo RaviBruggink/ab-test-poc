@@ -1,5 +1,5 @@
 <x-layout>
-    <section class="px-6 md:px-16 pt-20 min-h-screen">
+    <section class="px-6 md:px-16 pt-20 min-h-screen hidden">
         <div class="max-w-4xl mx-auto">
 
             <h1 class="text-3xl font-bold text-gray-800 mb-8">A/B Test: {{ $useCase->name }}</h1>
@@ -39,5 +39,9 @@
             </script>
 
         </div>
+    </section>
+
+    <section>
+
     </section>
 </x-layout>

@@ -6,7 +6,6 @@
     <div class="flex-1 space-y-3">
         <div class="flex justify-between items-center">
             <span class="text-neutral-700 text-lg font-bold">{{ $name }}</span>
-            <span class="bg-neutral-100 px-4 py-1 rounded text-sm text-neutral-700">Response {{ $variant }}</span>
         </div>
         <div class="text-neutral-700 text-sm sm:text-base leading-relaxed space-y-1">
             {!! $content !!}
