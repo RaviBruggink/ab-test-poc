@@ -1,220 +1,352 @@
 <x-layout>
-
-    <div class="my-12 bg-gray-50 p-6 rounded-xl shadow-sm border border-gray-200 relative">
+    <div class="m-6 bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200 relative text-sm">
 
         <!-- Colorblind toggle knop -->
-        <div class="absolute right-6 top-6">
-            <button 
-                id="toggleColorblindMode" 
-                aria-label="Toggle Colorblind Mode" 
-                class="group p-2 bg-neutral-700 text-white rounded-full hover:bg-neutral-600 transition"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z" />
-                    <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
-                    <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
-                    <circle cx="6.5" cy="12.5" r=".5" fill="currentColor" />
-                    <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" />
-                </svg>
-            </button>
-        </div>
+        <button id="toggleColorblindMode" aria-label="Toggle Colorblind Mode"
+            class="absolute right-3 top-3 group p-1.5 bg-neutral-700 text-white rounded-full hover:bg-neutral-600 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path
+                    d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z" />
+                <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
+                <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
+                <circle cx="6.5" cy="12.5" r=".5" fill="currentColor" />
+                <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" />
+            </svg>
+        </button>
 
         <!-- Titel en beschrijving -->
-        <h3 class="text-xl font-semibold mb-2">Modelvoorkeur per Use Case</h3>
-        <p class="text-md mb-8 w-2/3">
-            De scores tonen hoe vaak een AI-model als beste werd gekozen per use case.
+        <h3 class="text-lg font-semibold mb-1.5">Relatieve prestaties per Use Case</h3>
+        <p class="text-sm mb-5 max-w-[40ch]">
+            Hoe modellen scoren ten opzichte van een gekozen baseline binnen één specifieke use case.
         </p>
 
-        <!-- Grafiek -->
-        <div class="overflow-x-auto">
-            <div class="w-full h-[400px] relative">
-                <canvas id="modelChart" class="absolute top-0 left-0 w-full h-full"></canvas>
+        <!-- Filters -->
+        <div class="flex flex-wrap gap-4 mb-5">
+            <div>
+                <label for="useCaseSelect" class="text-xs font-semibold text-gray-600 block mb-1">Use Case</label>
+                <select id="useCaseSelect"
+                    class="text-sm border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-indigo-500">
+                    <option value="__average__">Gemiddelde over alle use cases</option>
+                    @foreach ($useCases as $uc)
+                        <option value="{{ $uc }}">{{ $uc }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div>
+                <label for="modelSelect" class="text-xs font-semibold text-gray-600 block mb-1">Baseline Model</label>
+                <select id="modelSelect"
+                    class="text-sm border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-indigo-500">
+                    <option value="__all__">Alle modellen (geen baseline)</option>
+                    @foreach ($models as $model)
+                        <option value="{{ $model['label'] }}">{{ $model['label'] }}</option>
+                    @endforeach
+                </select>
             </div>
         </div>
 
-        <!-- Model filters -->
-        <div id="modelLegend" class="flex flex-wrap gap-4 mb-6 text-sm font-medium text-gray-700 mt-10">
-            @foreach ($models as $model)
-                <div 
-                    class="flex items-center gap-2 cursor-pointer model-toggle" 
-                    data-model="{{ $model['label'] }}"
-                >
-                    <span 
-                        class="w-3 h-3 rounded-full" 
-                        style="background-color: {{ $model['color'] }};"
-                    ></span> 
-                    {{ $model['label'] }}
-                </div>
-            @endforeach
-        </div>
-
-        <!-- Use Case filters -->
-        <div id="useCaseLegend" class="flex flex-wrap gap-4 mb-6 text-sm font-medium text-gray-700">
-            @foreach ($useCases as $useCase)
-                <div 
-                    class="cursor-pointer px-3 py-1 rounded-full bg-neutral-200 hover:bg-neutral-300 transition usecase-toggle" 
-                    data-usecase="{{ $useCase }}"
-                >
-                    {{ $useCase }}
-                </div>
-            @endforeach
-        </div>
-
+        <!-- Grafiek -->
+        <div id="modelChartContainer" class="w-full overflow-x-auto"></div>
     </div>
 
+    <!-- Highcharts -->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
     <script>
-        // Basisvariabelen
-        const models = @json($models);
-        const allUseCases = @json($useCases);
-        const modelScores = @json($grouped);
+        document.addEventListener('DOMContentLoaded', () => {
+            // Gebruik jouw bestaande data
+            const models = @json($models);
+            const modelScores = @json($grouped);
+            const useCases = @json($useCases);
 
-        const originalColors = Object.fromEntries(models.map(m => [m.label, m.color]));
-        const colorblindColors = {
-            'GPT-4o': '#0072B2',
-            'Gemma (Ollama)': '#009E73',
-            'Llama3': '#E69F00',
-            'LLaMa 3.3': '#56B4E9',
-            'Claude 3.5 Sonnet': '#CC79A7',
-            'Claude 3.5 Haiku': '#F0E442',
-            'Claude 3.7 Sonnet': '#D55E00'
-        };
+            let selectedModel = "__all__";
+            let selectedUseCase = useCases[0] || "__average__";
+            let colorblindMode = false;
 
-        let visibleModels = new Set(models.map(m => m.label));
-        let visibleUseCases = new Set(allUseCases);
-        let colorblindMode = false;
+            const originalColors = Object.fromEntries(models.map(m => [m.label, m.color]));
+            const colorblindColors = {
+                'GPT-4o': '#0072B2',
+                'Gemma (Ollama)': '#009E73',
+                'Llama3': '#E69F00',
+                'LLaMa 3.3': '#56B4E9',
+                'Claude 3.5 Sonnet': '#CC79A7',
+                'Claude 3.5 Haiku': '#F0E442',
+                'Claude 3.7 Sonnet': '#D55E00'
+            };
 
-        const ctx = document.getElementById('modelChart').getContext('2d');
+            function renderChart(useCase, baselineLabel) {
+                const container = document.getElementById('modelChartContainer');
 
-        // Dataset opbouwen op basis van zichtbare modellen en use cases
-        function buildDatasets() {
-            return models
-                .filter(m => visibleModels.has(m.label))
-                .map(model => ({
-                    label: model.label,
-                    data: Array.from(visibleUseCases).map(uc => modelScores[model.label]?.[uc] || 0),
-                    backgroundColor: model.color,
-                    borderRadius: 8,
-                    borderSkipped: false
-                }));
-        }
+                if (baselineLabel === '__all__') {
+                    // Voor "alle modellen" - gebruik lollipop chart met absolute scores
+                    renderLollipopChart(useCase, container);
+                } else {
+                    // Voor baseline vergelijking - gebruik error bars met percentages
+                    renderErrorBarChart(useCase, baselineLabel, container);
+                }
+            }
 
-        // Maximale waarde voor de y-as berekenen
-        function calculateSuggestedMax() {
-            const allData = buildDatasets().flatMap(ds => ds.data);
-            const max = Math.max(...allData, 10);
-            return Math.ceil(max * 1.1);
-        }
+            function renderLollipopChart(useCase, container) {
+                const chartData = models.map((m, index) => {
+                    const score = modelScores[m.label]?.[useCase] ?? 0;
+                    const margin = Math.max(1, score * 0.08); // 8% marge of minimaal 1 punt
 
-        // Grafiek initiëren
-        const chart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: Array.from(visibleUseCases),
-                datasets: buildDatasets()
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { color: '#4b5563', stepSize: 5, padding: 10 },
-                        grid: { color: 'rgba(0,0,0,0.05)' },
-                        suggestedMax: calculateSuggestedMax()
+                    return {
+                        name: m.label,
+                        score: score,
+                        low: Math.max(0, score - margin),
+                        high: score + margin,
+                        color: colorblindMode ? (colorblindColors[m.label] || m.color) : m.color,
+                        x: index
+                    };
+                });
+
+                const maxScore = Math.max(...chartData.map(d => d.high), 10);
+                container.style.height = `${Math.max(chartData.length * 60, 400)}px`;
+
+                Highcharts.chart('modelChartContainer', {
+                    chart: {
+                        type: 'columnrange',
+                        inverted: true,
+                        backgroundColor: 'transparent',
+                        margin: [10, 80, 80, 120]
                     },
-                    x: {
-                        ticks: { color: '#4b5563' },
-                        grid: { color: 'rgba(0,0,0,0.05)' }
-                    }
-                },
-                plugins: {
-                    legend: { display: false },
-                    title: { display: false },
-                    datalabels: {
-                        anchor: 'end',
-                        align: 'end',
-                        color: '#374151',
-                        font: { weight: 'bold' },
-                        formatter: Math.round,
-                        clip: false
-                    }
-                }
-            },
-            plugins: [ChartDataLabels]
-        });
-
-        // Grafiek bijwerken
-        function updateChart() {
-            chart.data.labels = Array.from(visibleUseCases);
-            chart.data.datasets = buildDatasets();
-            chart.options.scales.y.suggestedMax = calculateSuggestedMax();
-            chart.update();
-        }
-
-        // Events: model selecteren
-        document.getElementById('modelLegend').addEventListener('click', e => {
-            const el = e.target.closest('.model-toggle');
-            if (!el) return;
-
-            const model = el.dataset.model;
-
-            if (visibleModels.size === models.length) {
-                visibleModels = new Set([model]);
-            } else {
-                visibleModels.has(model) ? visibleModels.delete(model) : visibleModels.add(model);
-                if (!visibleModels.size) {
-                    visibleModels = new Set(models.map(m => m.label));
-                }
+                    title: { text: null },
+                    xAxis: {
+                        categories: chartData.map(d => d.name),
+                        labels: {
+                            style: {
+                                color: '#374151',
+                                fontSize: '12px',
+                                fontWeight: '500'
+                            }
+                        },
+                        lineColor: '#e5e7eb',
+                        tickLength: 0
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Aantal stemmen',
+                            style: { color: '#6b7280', fontSize: '12px' }
+                        },
+                        gridLineColor: 'rgba(0,0,0,0.05)',
+                        labels: {
+                            style: {
+                                color: '#6b7280',
+                                fontSize: '11px'
+                            }
+                        },
+                        min: 0,
+                        max: Math.ceil(maxScore * 1.1)
+                    },
+                    tooltip: {
+                        formatter() {
+                            if (this.series.name === 'Score') {
+                                return `<strong>${this.point.name}</strong><br>Stemmen: ${Math.round(this.point.y)}`;
+                            } else {
+                                const point = this.point;
+                                return `<strong>${point.name}</strong><br>
+                                    Stemmen: ${Math.round(point.score)}<br>
+                                    Geschatte range: ${Math.round(point.low)} - ${Math.round(point.high)}`;
+                            }
+                        },
+                        style: { fontSize: '12px' }
+                    },
+                    plotOptions: {
+                        columnrange: {
+                            dataLabels: { enabled: false },
+                            borderRadius: 0,
+                            pointWidth: 8,
+                            borderWidth: 0,
+                            opacity: 0.3
+                        },
+                        scatter: {
+                            marker: {
+                                symbol: 'line',
+                                radius: 15,
+                                lineWidth: 3
+                            }
+                        }
+                    },
+                    legend: { enabled: false },
+                    credits: { enabled: false },
+                    series: [{
+                        name: 'Marge',
+                        data: chartData.map(d => ({
+                            name: d.name,
+                            low: d.low,
+                            high: d.high,
+                            score: d.score,
+                            color: d.color
+                        })),
+                        zIndex: 1
+                    }, {
+                        type: 'scatter',
+                        name: 'Score',
+                        data: chartData.map(d => ({
+                            name: d.name,
+                            x: d.x,
+                            y: d.score,
+                            color: d.color
+                        })),
+                        zIndex: 2,
+                        marker: {
+                            symbol: 'line',
+                            radius: 15,
+                            lineWidth: 3
+                        }
+                    }]
+                });
             }
 
-            updateChart();
+            function renderErrorBarChart(useCase, baselineLabel, container) {
+                const baselineModel = models.find(m => m.label === baselineLabel);
+                const baselineValue = modelScores[baselineModel.label]?.[useCase] || 1;
 
-            document.querySelectorAll('.model-toggle').forEach(btn => {
-                btn.classList.toggle('line-through', !visibleModels.has(btn.dataset.model));
-                btn.classList.toggle('opacity-50', !visibleModels.has(btn.dataset.model));
-            });
-        });
+                const chartData = models
+                    .filter(m => m.label !== baselineLabel)
+                    .map((m, index) => {
+                        const value = modelScores[m.label]?.[useCase] ?? 0;
+                        const diff = ((value - baselineValue) / baselineValue) * 100;
+                        const margin = Math.max(2, Math.abs(diff * 0.15)); // 15% marge of minimaal 2%
 
-        // Events: use case selecteren
-        document.getElementById('useCaseLegend').addEventListener('click', e => {
-            const el = e.target.closest('.usecase-toggle');
-            if (!el) return;
+                        return {
+                            name: m.label,
+                            score: diff,
+                            low: diff - margin,
+                            high: diff + margin,
+                            color: colorblindMode ? (colorblindColors[m.label] || m.color) : m.color,
+                            x: index
+                        };
+                    });
 
-            const uc = el.dataset.usecase;
+                container.style.height = `${Math.max(chartData.length * 60, 400)}px`;
 
-            if (visibleUseCases.size === allUseCases.length) {
-                visibleUseCases = new Set([uc]);
-            } else {
-                visibleUseCases.has(uc) ? visibleUseCases.delete(uc) : visibleUseCases.add(uc);
-                if (!visibleUseCases.size) {
-                    visibleUseCases = new Set(allUseCases);
-                }
+                Highcharts.chart('modelChartContainer', {
+                    chart: {
+                        type: 'columnrange',
+                        inverted: true,
+                        backgroundColor: 'transparent',
+                        margin: [10, 80, 80, 120]
+                    },
+                    title: { text: null },
+                    xAxis: {
+                        categories: chartData.map(d => d.name),
+                        labels: {
+                            style: {
+                                color: '#374151',
+                                fontSize: '12px',
+                                fontWeight: '500'
+                            }
+                        },
+                        lineColor: '#e5e7eb',
+                        tickLength: 0
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Verschil t.o.v. baseline (%)',
+                            style: { color: '#6b7280', fontSize: '12px' }
+                        },
+                        gridLineColor: 'rgba(0,0,0,0.05)',
+                        plotLines: [{
+                            color: '#9ca3af',
+                            width: 2,
+                            value: 0,
+                            zIndex: 1,
+                            dashStyle: 'Dash'
+                        }],
+                        labels: {
+                            formatter() {
+                                return `${this.value > 0 ? '+' : ''}${Math.round(this.value)}%`;
+                            },
+                            style: {
+                                color: '#6b7280',
+                                fontSize: '11px'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        formatter() {
+                            if (this.series.name === 'Score') {
+                                return `<strong>${this.point.name}</strong><br>Verschil: ${this.point.y > 0 ? '+' : ''}${this.point.y.toFixed(1)}%`;
+                            } else {
+                                const point = this.point;
+                                return `<strong>${point.name}</strong><br>
+                                    Verschil: ${point.score > 0 ? '+' : ''}${point.score.toFixed(1)}%<br>
+                                    Geschatte range: ${point.low.toFixed(1)}% tot ${point.high.toFixed(1)}%`;
+                            }
+                        },
+                        style: { fontSize: '12px' }
+                    },
+                    plotOptions: {
+                        columnrange: {
+                            dataLabels: { enabled: false },
+                            borderRadius: 0,
+                            pointWidth: 8,
+                            borderWidth: 0,
+                            opacity: 0.3
+                        },
+                        scatter: {
+                            marker: {
+                                symbol: 'line',
+                                radius: 15,
+                                lineWidth: 3
+                            }
+                        }
+                    },
+                    legend: { enabled: false },
+                    credits: { enabled: false },
+                    series: [{
+                        name: 'Marge',
+                        data: chartData.map(d => ({
+                            name: d.name,
+                            low: d.low,
+                            high: d.high,
+                            score: d.score,
+                            color: d.color
+                        })),
+                        zIndex: 1
+                    }, {
+                        type: 'scatter',
+                        name: 'Score',
+                        data: chartData.map(d => ({
+                            name: d.name,
+                            x: d.x,
+                            y: d.score,
+                            color: d.color
+                        })),
+                        zIndex: 2,
+                        marker: {
+                            symbol: 'line',
+                            radius: 15,
+                            lineWidth: 3
+                        }
+                    }]
+                });
             }
 
-            updateChart();
-
-            document.querySelectorAll('.usecase-toggle').forEach(btn => {
-                btn.classList.toggle('line-through', !visibleUseCases.has(btn.dataset.usecase));
-                btn.classList.toggle('opacity-50', !visibleUseCases.has(btn.dataset.usecase));
+            // Events
+            document.getElementById('modelSelect').addEventListener('change', e => {
+                selectedModel = e.target.value;
+                renderChart(selectedUseCase, selectedModel);
             });
+
+            document.getElementById('useCaseSelect').addEventListener('change', e => {
+                selectedUseCase = e.target.value;
+                renderChart(selectedUseCase, selectedModel);
+            });
+
+            document.getElementById('toggleColorblindMode').addEventListener('click', () => {
+                colorblindMode = !colorblindMode;
+                renderChart(selectedUseCase, selectedModel);
+            });
+
+            // Initial render
+            renderChart(selectedUseCase, selectedModel);
         });
-
-        // Events: colorblind mode toggelen
-        document.getElementById('toggleColorblindMode').addEventListener('click', () => {
-            colorblindMode = !colorblindMode;
-
-            models.forEach(model => {
-                model.color = colorblindMode ? colorblindColors[model.label] : originalColors[model.label];
-            });
-
-            document.querySelectorAll('.model-toggle span').forEach(el => {
-                const label = el.parentNode.dataset.model;
-                el.style.backgroundColor = colorblindMode ? colorblindColors[label] : originalColors[label];
-            });
-
-            updateChart();
-        });
-
     </script>
-
 </x-layout>

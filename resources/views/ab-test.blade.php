@@ -1,5 +1,5 @@
 <x-layout>
-    <section class="px-20 pb-14 pt-5 min-h-screen">
+    <section class="px-20 pb-14 pt-5 max-h-screen">
         <div class="mx-auto w-full">
 
             {{-- Gebruikersbericht --}}
@@ -11,7 +11,7 @@
             />
 
             {{-- A/B Cards --}}
-            <section class="flex flex-col lg:flex-row gap-6 pb-40">
+            <section class="flex flex-col lg:flex-row gap-6">
                 @php
                     $cardContentA = '
                         <p>Line-up voor DanceFest 3000:</p>
@@ -53,7 +53,7 @@
             </section>
 
             {{-- Chat Input --}}
-            <div class="fixed bottom-10 left-0 right-0 px-4">
+            <div class="bottom-10 fixed left-[30%] w-[50%]">
                 <div class="max-w-screen-md mx-auto rounded-2xl px-4 py-3 bg-gray-50 shadow-sm border border-gray-200">
                     <div class="flex items-center gap-2">
                         <textarea 
@@ -82,14 +82,38 @@
                 </div>
             </div>
 
-            {{-- Succesmelding --}}
+            {{-- Toast Notificatie --}}
             @if (session('success'))
-                <div class="mb-6 p-4 bg-green-100 text-green-800 rounded-lg shadow-sm">
-                    {{ session('success') }}
+            <div 
+                x-data="{ show: false }"
+                x-init="setTimeout(() => show = true, 50); setTimeout(() => show = false, 4050)"
+                x-show="show"
+                x-transition:enter="transform transition ease-out duration-500"
+                x-transition:enter-start="translate-x-full opacity-0"
+                x-transition:enter-end="translate-x-0 opacity-100"
+                x-transition:leave="transform transition ease-in duration-500"
+                x-transition:leave-start="translate-x-0 opacity-100"
+                x-transition:leave-end="translate-x-full opacity-0"
+                class="fixed top-10 right-4 z-50 w-96 max-w-full"
+                style="display: none;"
+            >
+                <div class="flex shadow-lg rounded-lg overflow-hidden">
+                    <div class="bg-red-400 p-4 flex items-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <div class="bg-white p-4 w-full">
+                        <div class="text-sm text-gray-800 font-semibold">Thank you for your feedback!</div>
+                        <div class="text-xs text-gray-500">We will incorporate it and improve your experience</div>
+                    </div>
                 </div>
+            </div>
             @endif
-            
 
+            {{-- A/B Test Intro --}}
+
+        
             {{-- hidden voor presentatie demo --}}
             <section class="hidden">
                 <h1 class="text-3xl font-bold text-gray-800 mb-8">
