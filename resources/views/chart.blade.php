@@ -1,5 +1,6 @@
 <x-layout>
     <div class="relative text-sm">
+        <!-- Colorblind mode toggle button -->
         <button id="toggleColorblindMode" aria-label="Toggle Colorblind Mode"
             class="hidden right-3 top-3 group p-1.5 bg-neutral-700 text-white rounded-full hover:bg-neutral-600 transition">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor"
@@ -13,9 +14,12 @@
             </svg>
         </button>
 
+        <!-- Page title -->
         <h3 class="text-5xl font-semibold my-16 ml-14">Models</h3>
 
+        <!-- Filters section -->
         <div class="flex flex-wrap gap-4 mb-10 ml-14">
+            <!-- Use case filter dropdown -->
             <div>
                 <label for="useCaseSelect" class="text-xs font-semibold text-gray-600 block mb-1">Use Case</label>
                 <select id="useCaseSelect"
@@ -27,6 +31,7 @@
                 </select>
             </div>
 
+            <!-- Baseline model filter dropdown -->
             <div>
                 <label for="modelSelect" class="text-xs font-semibold text-gray-600 block mb-1">Baseline</label>
                 <select id="modelSelect"
@@ -39,12 +44,13 @@
             </div>
         </div>
 
-        <div class="">
+        <!-- Chart container -->
+        <div class="flex justify-end">
             <div id="modelChartContainer" class="w-full overflow-x-auto"></div>
         </div>
-
     </div>
 
+    <!-- Highcharts library imports -->
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/highcharts-more.js"></script>
     <script src="https://code.highcharts.com/modules/xrange.js"></script>
@@ -52,15 +58,19 @@
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
 
     <script>
+        // Main script that runs when the DOM is fully loaded
         document.addEventListener('DOMContentLoaded', () => {
+            // Initialize data from server-side variables
             const models = @json($models);
             const modelScores = @json($grouped);
             const useCases = @json($useCases);
 
+            // State variables
             let selectedModel = "__all__";
             let selectedUseCase = useCases[0] || "__average__";
             let colorblindMode = false;
 
+            // Color palette for colorblind mode
             const colorblindColors = {
                 'GPT-4o': '#0072B2',
                 'Gemma (Ollama)': '#009E73',
@@ -71,18 +81,26 @@
                 'Claude 3.7 Sonnet': '#D55E00'
             };
 
+            /**
+             * Renders the chart with the given use case and baseline model
+             * @param {string} useCase - The selected use case
+             * @param {string} baselineLabel - The selected baseline model label
+             */
             function renderChart(useCase, baselineLabel) {
                 const container = document.getElementById('modelChartContainer');
-                const xrangeData = [];
-                const markerData = [];
+                const xrangeData = []; // Data for the horizontal bars
+                const markerData = []; // Data for the score markers
 
+                // Determine if we're comparing to a baseline
                 const isBaseline = baselineLabel !== '__all__';
                 const baselineValue = isBaseline ? (modelScores[baselineLabel]?.[useCase] || 1) : null;
 
+                // Prepare data for each model
                 models.forEach((m, index) => {
                     const value = modelScores[m.label]?.[useCase] ?? 0;
                     const color = colorblindMode ? (colorblindColors[m.label] || m.color) : m.color;
 
+                    // Calculate score and label based on baseline mode
                     let score, margin, label;
                     if (isBaseline) {
                         const diff = ((value - baselineValue) / baselineValue) * 100;
@@ -93,11 +111,12 @@
                         label = `${score}`;
                     }
 
+                    // Calculate margin for the bar width
                     margin = isBaseline
                         ? (m.label === baselineLabel ? 0 : Math.max(2, Math.abs(score * 0.15)))
                         : Math.max(1, score * 0.08);
 
-
+                    // Add data for the horizontal bar
                     xrangeData.push({
                         x: score - margin,
                         x2: score + margin,
@@ -108,6 +127,7 @@
                         score
                     });
 
+                    // Add data for the score marker
                     markerData.push({
                         x: score,
                         y: index,
@@ -118,6 +138,7 @@
                     });
                 });
 
+                // Calculate positioning for labels
                 const lowestX = Math.min(...xrangeData.map(d => d.x));
                 let labelXPosition;
 
@@ -129,56 +150,64 @@
                     labelXPosition = minSafeLeft;
                 }
 
+                // Prepare label data
                 const labelData = models.map((m, idx) => ({
                     x: labelXPosition,
                     y: idx,
                     name: m.label
                 }));
 
+                // Create alternating background bands for better readability
                 const plotBands = models.map((m, i) => ({
                     from: i - 0.5,
                     to: i + 0.5,
-                    color: i % 2 === 0 ? '#fafafa' : '#ffffff'
+                    color: i % 2 === 0 ? '#f8fafc' : '#ffffff'
                 }));
 
+                // Calculate chart dimensions
                 const chartWidth = container.offsetWidth;
-                const labelXOffset = -chartWidth / 2 + 60;  // Pas 60 aan naar wens voor marge
+                const labelXOffset = -chartWidth / 2 + 60;
 
-
+                // Set dynamic height based on number of models
                 container.style.height = `${Math.max(models.length * 60, 400)}px`;
+                container.style.width = '100%';
 
+                // Create the Highcharts chart
                 Highcharts.chart('modelChartContainer', {
                     chart: {
                         type: 'xrange',
                         backgroundColor: 'transparent',
-                        margin: [10, 0, 80, 0],
+                        margin: [10, 0, 80, 190], // Top, right, bottom, left
                     },
-                    title: { text: null },
+                    title: { text: null }, // No title
                     xAxis: {
+                        tickInterval: 10,
                         tickColor: '#CECECE',
                         tickWidth: 1,
-                        min: labelXPosition - 10,
-                        lineColor: '#CECECE',
-                        lineWidth: 1,
+                        min: labelXPosition - 10, // Dynamic minimum based on data
+                        lineWidth: 0,
                         title: {
                             text: isBaseline ? 'Verschil t.o.v. baseline (%)' : 'Absolute score',
                             enabled: false,
                         },
-                        gridLineWidth: 0,
-                        plotLines: isBaseline ? [{
-                            color: '#9ca3af',
-                            width: 1,
-                            value: 0,
-                            zIndex: 1,
-                            dashStyle: 'Dash'
-                        }] : [],
+                        gridLineWidth: 1,
+                        gridLineColor: '#CECECE',
+                        plotLines: [
+                            ...(isBaseline ? [{
+                                color: '#6B7280',
+                                width: 1,
+                                value: 0,
+                                dashStyle: 'Dash',
+                                zIndex: 2
+                            }] : [])
+                        ],
                         labels: {
                             formatter() {
                                 const v = this.value;
                                 return isBaseline ? `${v > 0 ? '+' : ''}${Math.round(v)}%` : `${Math.round(v)}`;
                             },
                             style: {
-                                color: '#CECECE',
+                                color: '#111827',
                                 fontSize: '11px',
                                 fontWeight: '600'
                             }
@@ -186,32 +215,56 @@
                     },
                     yAxis: {
                         categories: models.map(m => m.label),
-                        reversed: true,
-                        plotBands: plotBands,
-                        gridLineWidth: 0,
+                        reversed: true, // Show top model first
+                        plotBands: plotBands, // Alternating background colors
+                        gridLineWidth: 0, // No grid lines
                         labels: {
-                            enabled: false,
-                            useHTML: true,
-                            formatter: function () {
+                            borderBottom: '2px solid #CECECE',
+                            x: 0,
+                            enabled: true,
+                            useHTML: true, // Allow custom HTML in labels
+                            formatter: function () {    
                                 const i = this.pos;
-                                const bgColor = i % 2 === 0 ? '#fafafa' : '#ffffff';
-                                return `<span style="
-                                    display: flex;
-                                    background-color: ${bgColor};
-                                    padding: 4px 6px 0px 20px;
-                                    min-width: 140px;
-                                    min-height: 47px;
-                                    text-align: left;
-                                    box-sizing: border-box;
-                                    width: 100%;
-                                    justify-content: start;
-                                    align-items: center;
-                                ">${this.value}</span>`;
+                                const label = this.value;
+                                const bgColor = i % 2 === 0 ? '#f8fafc' : '#ffffff';
+
+                                // Get model color based on current mode
+                                const model = models.find(m => m.label === label);
+                                const color = colorblindMode
+                                    ? (colorblindColors[label] || model?.color || '#000')
+                                    : (model?.color || '#000');
+
+                                // Custom label HTML with colored dot and model name
+                                return `
+                                    <div style="
+                                        display: flex;
+                                        align-items: center;
+                                        background-color: ${bgColor};
+                                        min-height: 47px;
+                                        width: 300px;
+                                        padding-left: 160px;
+                                        box-sizing: border-box;
+                                        font-family: inter, sans-serif;
+                                        font-size: 14px;
+                                        font-weight: 400;
+                                        color: #444142;
+                                    ">
+                                        <span style="
+                                            width: 10px;
+                                            height: 10px;
+                                            border-radius: 50%;
+                                            background-color: ${color};
+                                            margin-left: 8px;
+                                            flex-shrink: 0;
+                                        "></span>
+                                        <span style="flex: 1; text-align: left; padding-left: 8px;">${label}</span>
+                                    </div>
+                                `;
                             },
                             style: {
-                                color: '#374151',
-                                fontSize: '12px',
-                                fontWeight: '500',
+                                color: '#111827',
+                                fontSize: '14px',
+                                fontWeight: '100',
                                 whiteSpace: 'nowrap'
                             }
                         }
@@ -223,8 +276,9 @@
                         shadow: false,
                         backgroundColor: 'transparent',
                         formatter() {
+                            // Custom tooltip HTML with model info and metrics
                             return `
-                                <div style="padding: 8px 12px; font-family: sans-serif; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                <div style="padding: 8px 12px; font-family: sans-serif; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 1px solid #E5E7EB; position: relative;">
                                     <strong style="display:block; font-size:13px; margin-bottom: 4px; color:#111; justify-content: center; text-align: center;">
                                         ${this.point.name}
                                     </strong>
@@ -275,7 +329,7 @@
                             pointPadding: 0.3,
                             groupPadding: 0.1,
                             pointWidth: 15,
-                            borderRadius: 999,
+                            borderRadius: 999, // Fully rounded ends
                             dataLabels: { enabled: false },
                             states: {
                                 inactive: { enabled: false }
@@ -299,9 +353,9 @@
                             }
                         }
                     },
-                    legend: { enabled: false },
-                    credits: { enabled: false },
-                    exporting: { enabled: false },
+                    legend: { enabled: false }, // No legend
+                    credits: { enabled: false }, // No credits
+                    exporting: { enabled: false }, // No export menu
                     series: [
                         {
                             name: 'Labels',
@@ -310,7 +364,7 @@
                             enableMouseTracking: false,
                             marker: { enabled: false },
                             dataLabels: {
-                                enabled: true,
+                                enabled: false,
                                 align: 'left',
                                 x: labelXOffset,
                                 verticalAlign: 'middle',
@@ -320,7 +374,6 @@
                                             display: flex;
                                             align-items: center;
                                             padding-left: 60px;
-                                            border-radius: 6px;
                                             font-size: 16px;
                                             font-weight: 300;
                                             color: #111827;
@@ -340,12 +393,13 @@
                                 }
                             }
                         },
-                        { name: 'Interval', data: xrangeData },
-                        { type: 'scatter', name: 'Score', data: markerData, zIndex: 3 }
+                        { name: 'Interval', data: xrangeData }, // The horizontal bars
+                        { type: 'scatter', name: 'Score', data: markerData, zIndex: 3 } // The score markers
                     ]
                 });
             }
 
+            // Event listeners for filter changes
             document.getElementById('modelSelect').addEventListener('change', e => {
                 selectedModel = e.target.value;
                 renderChart(selectedUseCase, selectedModel);
@@ -356,11 +410,13 @@
                 renderChart(selectedUseCase, selectedModel);
             });
 
+            // Colorblind mode toggle
             document.getElementById('toggleColorblindMode').addEventListener('click', () => {
                 colorblindMode = !colorblindMode;
                 renderChart(selectedUseCase, selectedModel);
             });
 
+            // Initial chart render
             renderChart(selectedUseCase, selectedModel);
         });
     </script>
