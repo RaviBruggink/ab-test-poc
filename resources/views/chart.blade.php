@@ -23,7 +23,7 @@
             <div>
                 <label for="useCaseSelect" class="text-xs font-semibold text-gray-600 block mb-1">Use Case</label>
                 <select id="useCaseSelect"
-                    class="text-md border border-gray-300 rounded px-2 py-2 focus:ring-2 focus:ring-indigo-500">
+                    class="text-md border border-[#CECECE] bg-[#f8fafc] rounded px-2 py-2">
                     <option value="__average__">All</option>
                     @foreach ($useCases as $uc)
                         <option value="{{ $uc }}">{{ $uc }}</option>
@@ -35,18 +35,32 @@
             <div>
                 <label for="modelSelect" class="text-xs font-semibold text-gray-600 block mb-1">Baseline</label>
                 <select id="modelSelect"
-                    class="text-md border border-gray-300 rounded px-2 py-2 focus:ring-2 focus:ring-indigo-500">
+                    class="text-md border border-[#CECECE] bg-[#f8fafc] rounded px-2 py-2">
                     <option value="__all__">None</option>
                     @foreach ($models as $model)
                         <option value="{{ $model['label'] }}">{{ $model['label'] }}</option>
                     @endforeach
                 </select>
             </div>
+
+            <div class="ml-auto mr-14">
+                <button id="actionsButton"
+                    class="bg-black text-white px-4 py-2 rounded font-medium hover:bg-gray-800 flex flex-row items-center gap-2">
+                    Actions 
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down-icon lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+
+                <!-- Dropdown menu -->
+                <div id="actionsMenu" class="absolute right-14 mt-2 w-40 bg-white rounded-md shadow-lg z-10 hidden">
+                    <button class="w-full text-left px-4 py-2 text-sm text-gray-800 bg-[#f8fafc] border-[#CECECE] rounded-t-md hover:bg-[#f3f3f3]">Add model +</button>
+                    <button class="w-full text-left px-4 py-2 text-sm text-gray-800 bg-[#f8fafc] border-[#CECECE] rounded-b-md hover:bg-[#f3f3f3]">Test models</button>
+                </div>
+            </div>
         </div>
 
         <!-- Chart container -->
         <div class="flex justify-end">
-            <div id="modelChartContainer" class="w-full overflow-x-auto"></div>
+            <div id="modelChartContainer" class="w-full"></div>
         </div>
     </div>
 
@@ -58,19 +72,28 @@
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
 
     <script>
-        // Main script that runs when the DOM is fully loaded
+
+        const actionsButton = document.getElementById('actionsButton');
+        const actionsMenu = document.getElementById('actionsMenu');
+
+        actionsButton.addEventListener('click', () => {
+            actionsMenu.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!actionsButton.contains(e.target) && !actionsMenu.contains(e.target)) {
+                actionsMenu.classList.add('hidden');
+            }
+        });
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize data from server-side variables
             const models = @json($models);
             const modelScores = @json($grouped);
             const useCases = @json($useCases);
 
-            // State variables
             let selectedModel = "__all__";
             let selectedUseCase = useCases[0] || "__average__";
             let colorblindMode = false;
 
-            // Color palette for colorblind mode
             const colorblindColors = {
                 'GPT-4o': '#0072B2',
                 'Gemma (Ollama)': '#009E73',
@@ -83,27 +106,26 @@
 
             /**
              * Renders the chart with the given use case and baseline model
-             * @param {string} useCase - The selected use case
-             * @param {string} baselineLabel - The selected baseline model label
+             * @param {string} useCase
+             * @param {string} baselineLabel
              */
             function renderChart(useCase, baselineLabel) {
                 const container = document.getElementById('modelChartContainer');
-                const xrangeData = []; // Data for the horizontal bars
-                const markerData = []; // Data for the score markers
+                const xrangeData = [];
+                const markerData = [];
 
-                // Determine if we're comparing to a baseline
                 const isBaseline = baselineLabel !== '__all__';
                 const baselineValue = isBaseline ? (modelScores[baselineLabel]?.[useCase] || 1) : null;
 
-                // Prepare data for each model
                 models.forEach((m, index) => {
                     const value = modelScores[m.label]?.[useCase] ?? 0;
                     const color = colorblindMode ? (colorblindColors[m.label] || m.color) : m.color;
 
-                    // Calculate score and label based on baseline mode
-                    let score, margin, label;
+                    let score, label;
+
                     if (isBaseline) {
-                        const diff = ((value - baselineValue) / baselineValue) * 100;
+                        const baseline = baselineValue || 1;
+                        const diff = ((value - baseline) / baseline) * 100;
                         score = parseFloat(diff.toFixed(1));
                         label = `${score > 0 ? '+' : ''}${score}%`;
                     } else {
@@ -111,12 +133,8 @@
                         label = `${score}`;
                     }
 
-                    // Calculate margin for the bar width
-                    margin = isBaseline
-                        ? (m.label === baselineLabel ? 0 : Math.max(2, Math.abs(score * 0.15)))
-                        : Math.max(1, score * 0.08);
+                    const margin = 2;
 
-                    // Add data for the horizontal bar
                     xrangeData.push({
                         x: score - margin,
                         x2: score + margin,
@@ -127,7 +145,6 @@
                         score
                     });
 
-                    // Add data for the score marker
                     markerData.push({
                         x: score,
                         y: index,
@@ -138,7 +155,6 @@
                     });
                 });
 
-                // Calculate positioning for labels
                 const lowestX = Math.min(...xrangeData.map(d => d.x));
                 let labelXPosition;
 
@@ -150,41 +166,51 @@
                     labelXPosition = minSafeLeft;
                 }
 
-                // Prepare label data
                 const labelData = models.map((m, idx) => ({
                     x: labelXPosition,
                     y: idx,
                     name: m.label
                 }));
 
-                // Create alternating background bands for better readability
                 const plotBands = models.map((m, i) => ({
                     from: i - 0.5,
                     to: i + 0.5,
                     color: i % 2 === 0 ? '#f8fafc' : '#ffffff'
                 }));
 
-                // Calculate chart dimensions
                 const chartWidth = container.offsetWidth;
                 const labelXOffset = -chartWidth / 2 + 60;
 
-                // Set dynamic height based on number of models
                 container.style.height = `${Math.max(models.length * 60, 400)}px`;
                 container.style.width = '100%';
 
-                // Create the Highcharts chart
+                Highcharts.SVGRenderer.prototype.symbols.vertbar = function (x, y, w, h) {
+                    const barWidth = 2;
+                    const barHeight = 14;
+                    const offsetX = x + (w - barWidth) / 2;
+                    const offsetY = y + (h - barHeight) / 2;
+                    return [
+                        'M', offsetX, offsetY,
+                        'L', offsetX + barWidth, offsetY,
+                        offsetX + barWidth, offsetY + barHeight,
+                        offsetX, offsetY + barHeight,
+                        'Z'
+                    ];
+                };
+
+
                 Highcharts.chart('modelChartContainer', {
                     chart: {
                         type: 'xrange',
                         backgroundColor: 'transparent',
-                        margin: [10, 0, 80, 190], // Top, right, bottom, left
+                        margin: [10, 0, 80, 190],
                     },
-                    title: { text: null }, // No title
+                    title: { text: null },
                     xAxis: {
                         tickInterval: 10,
                         tickColor: '#CECECE',
                         tickWidth: 1,
-                        min: labelXPosition - 10, // Dynamic minimum based on data
+                        min: labelXPosition - 10,
                         lineWidth: 0,
                         title: {
                             text: isBaseline ? 'Verschil t.o.v. baseline (%)' : 'Absolute score',
@@ -195,9 +221,9 @@
                         plotLines: [
                             ...(isBaseline ? [{
                                 color: '#6B7280',
-                                width: 1,
+                                width: 2,
                                 value: 0,
-                                dashStyle: 'Dash',
+                                dashStyle: 'Solid',
                                 zIndex: 2
                             }] : [])
                         ],
@@ -215,26 +241,24 @@
                     },
                     yAxis: {
                         categories: models.map(m => m.label),
-                        reversed: true, // Show top model first
-                        plotBands: plotBands, // Alternating background colors
-                        gridLineWidth: 0, // No grid lines
+                        reversed: true,
+                        plotBands: plotBands,
+                        gridLineWidth: 0,
                         labels: {
                             borderBottom: '2px solid #CECECE',
                             x: 0,
                             enabled: true,
-                            useHTML: true, // Allow custom HTML in labels
-                            formatter: function () {    
+                            useHTML: true,
+                            formatter: function () {
                                 const i = this.pos;
                                 const label = this.value;
                                 const bgColor = i % 2 === 0 ? '#f8fafc' : '#ffffff';
 
-                                // Get model color based on current mode
                                 const model = models.find(m => m.label === label);
                                 const color = colorblindMode
                                     ? (colorblindColors[label] || model?.color || '#000')
                                     : (model?.color || '#000');
 
-                                // Custom label HTML with colored dot and model name
                                 return `
                                     <div style="
                                         display: flex;
@@ -276,7 +300,6 @@
                         shadow: false,
                         backgroundColor: 'transparent',
                         formatter() {
-                            // Custom tooltip HTML with model info and metrics
                             return `
                                 <div style="padding: 8px 12px; font-family: sans-serif; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 1px solid #E5E7EB; position: relative;">
                                     <strong style="display:block; font-size:13px; margin-bottom: 4px; color:#111; justify-content: center; text-align: center;">
@@ -325,11 +348,11 @@
                     },
                     plotOptions: {
                         xrange: {
-                            borderWidth: 0,
+                            borderColor: '#00000000',
                             pointPadding: 0.3,
                             groupPadding: 0.1,
                             pointWidth: 15,
-                            borderRadius: 999, // Fully rounded ends
+                            borderRadius: 100,
                             dataLabels: { enabled: false },
                             states: {
                                 inactive: { enabled: false }
@@ -341,10 +364,8 @@
                             },
                             enableMouseTracking: false,
                             marker: {
-                                symbol: 'line',
-                                lineWidth: 2,
-                                lineColor: '#111',
-                                radius: 4
+                                symbol: 'vertbar',
+                                fillColor: '#111827',
                             },
                             states: {
                                 inactive: {
@@ -353,9 +374,9 @@
                             }
                         }
                     },
-                    legend: { enabled: false }, // No legend
-                    credits: { enabled: false }, // No credits
-                    exporting: { enabled: false }, // No export menu
+                    legend: { enabled: false },
+                    credits: { enabled: false },
+                    exporting: { enabled: false },
                     series: [
                         {
                             name: 'Labels',
@@ -393,13 +414,12 @@
                                 }
                             }
                         },
-                        { name: 'Interval', data: xrangeData }, // The horizontal bars
-                        { type: 'scatter', name: 'Score', data: markerData, zIndex: 3 } // The score markers
+                        { name: 'Interval', data: xrangeData },
+                        { type: 'scatter', name: 'Score', data: markerData, zIndex: 3 }
                     ]
                 });
             }
 
-            // Event listeners for filter changes
             document.getElementById('modelSelect').addEventListener('change', e => {
                 selectedModel = e.target.value;
                 renderChart(selectedUseCase, selectedModel);
@@ -410,13 +430,11 @@
                 renderChart(selectedUseCase, selectedModel);
             });
 
-            // Colorblind mode toggle
             document.getElementById('toggleColorblindMode').addEventListener('click', () => {
                 colorblindMode = !colorblindMode;
                 renderChart(selectedUseCase, selectedModel);
             });
 
-            // Initial chart render
             renderChart(selectedUseCase, selectedModel);
         });
     </script>
