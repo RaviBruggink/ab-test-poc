@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->timestamps();
 
             $table->unique(['model_id', 'use_case_id']);
+            //! foreignId's are automatically unique in the context of the foreign key constraint
         });
     }
 

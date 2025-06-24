@@ -46,7 +46,7 @@
             <div class="ml-auto mr-14">
                 <button id="actionsButton"
                     class="bg-black text-white px-4 py-2 rounded font-medium hover:bg-gray-800 flex flex-row items-center gap-2">
-                    Actions 
+                    Actions
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down-icon lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg>
                 </button>
 
@@ -65,6 +65,7 @@
     </div>
 
     <!-- Highcharts library imports -->
+    {{-- ! Why are you including the Highcharts library here? And why are you setting the script inside this php file? --}}
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/highcharts-more.js"></script>
     <script src="https://code.highcharts.com/modules/xrange.js"></script>

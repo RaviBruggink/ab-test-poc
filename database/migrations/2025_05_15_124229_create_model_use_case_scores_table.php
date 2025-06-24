@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->timestamps();
 
             $table->unique(['model_id', 'use_case_id']); // Zorgt ervoor dat je niet twee keer dezelfde combinatie kunt opslaan
+            //! foreignId's are automatically unique in the context of the foreign key constraint
         });
     }
 

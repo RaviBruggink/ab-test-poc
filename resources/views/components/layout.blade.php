@@ -25,6 +25,7 @@
 <body class="bg-white text-gray-900 flex flex-row min-h-screen">
 
   <!-- Sidebar -->
+<!-- !Try making an component of the navigation links, maybe also a seperate component for large svg's. So you will keep your code clean and readable -->
   <aside class="bg-slate-50 w-64 flex flex-col justify-between h-[100vh] border-r text-md sticky top-0">
     <div class="p-6 flex flex-col gap-8 h-full">
       <!-- Logo & Version -->
@@ -111,7 +112,7 @@
               filter: grayscale(100%);
               transition: filter 0.3s ease;
             }
-          
+
             .pinned-link:hover img {
               filter: grayscale(0%);
             }

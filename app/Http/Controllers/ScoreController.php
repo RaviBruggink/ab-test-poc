@@ -76,6 +76,11 @@ class ScoreController extends Controller
      */
     public function showChart()
     {
+        // Solution
+        // AiModel::where('name', config('models.models.*.label'))->get();
+        // UseCase::where('name', config('models.use_cases.*'))->get();
+
+        //! Here you get all the models within the config file
         $models = config('models.models');
         $useCases = config('models.use_cases');
 
@@ -84,7 +89,10 @@ class ScoreController extends Controller
 
         $grouped = [];
 
+        //! Then you loop through all the models
         foreach ($models as $modelConfig) {
+
+            //! You get the label and then get the AiModel by that label
             $label = $modelConfig['label'];
             $model = AiModel::where('name', $label)->first();
 

@@ -3,15 +3,16 @@
         <div class="mx-auto w-full">
 
             {{-- Gebruikersbericht --}}
-            <x-chat.message 
-                avatar="https://gravatar.com/avatar/27205e5c51cb03f862138b22bcb5dc20f94a342e744ff6df1b8dc8af3c865109?s=200" 
-                name="User" 
+            <x-chat.message
+                avatar="https://gravatar.com/avatar/27205e5c51cb03f862138b22bcb5dc20f94a342e744ff6df1b8dc8af3c865109?s=200"
+                name="User"
                 time="13:31"
-                content="<p>Hey Nova, kan je me helpen? Ik zoek artiesten informatie voor Dancefest 3000</p>" 
+                content="<p>Hey Nova, kan je me helpen? Ik zoek artiesten informatie voor Dancefest 3000</p>"
             />
 
             {{-- A/B Cards --}}
             <section class="flex flex-col lg:flex-row gap-6">
+                {{-- ! The idea of an view and controller is that you have your PHP logic inside the controller to leave the view clean. Move this to the controller. --}}
                 @php
                     $cardContentA = '
                         <p>Line-up voor DanceFest 3000:</p>
@@ -56,14 +57,14 @@
             <div class="bottom-10 fixed left-[30%] w-[50%]">
                 <div class="max-w-screen-md mx-auto rounded-2xl px-4 py-3 bg-gray-50 shadow-sm border border-gray-200">
                     <div class="flex items-center gap-2">
-                        <textarea 
-                            x-data="chatInput" 
-                            x-model="chatMessage" 
+                        <textarea
+                            x-data="chatInput"
+                            x-model="chatMessage" {{-- ! Why are you setting an x-model here? --}}
                             x-on:change="resize($el)"
-                            x-on:message-sent.window="resize($el)" 
-                            x-ref="answer"
+                            x-on:message-sent.window="resize($el)"
+                            x-ref="answer" {{-- ! Why are you setting an x-ref here? --}}
                             @keydown.enter="if (!$event.shiftKey) { $event.preventDefault(); send() }"
-                            @keyup.enter="if ($event.shiftKey) { $event.preventDefault(); }" 
+                            @keyup.enter="if ($event.shiftKey) { $event.preventDefault(); }"
                             @input="resize($el)"
                             placeholder="Start typing to chat..."
                             class="w-full resize-none bg-transparent border-none focus:ring-0 text-gray-700 text-md"
@@ -84,7 +85,7 @@
 
             {{-- Toast Notificatie --}}
             @if (session('success'))
-            <div 
+            <div
                 x-data="{ show: false }"
                 x-init="setTimeout(() => show = true, 50); setTimeout(() => show = false, 4050)"
                 x-show="show"
@@ -113,7 +114,7 @@
 
             {{-- A/B Test Intro --}}
 
-        
+
             {{-- hidden voor presentatie demo --}}
             <section class="hidden">
                 <h1 class="text-3xl font-bold text-gray-800 mb-8">
@@ -123,7 +124,7 @@
                         Start een A/B Test
                     @endif
                 </h1>
-                
+
                 @if (isset($distribution))
                     <div class="mb-8 p-4 bg-purple-100 rounded-lg text-purple-800">
                         Je test nu bot {{ $distribution->bot_name }} voor de use case
@@ -169,6 +170,7 @@
                         </div>
                     @endif
 
+                    {{-- ! The idea of an view and controller is that you have your PHP logic inside the controller to leave the view clean. Move this to the controller. --}}
                     @php
                         $modelA = old('model_a') ?? ($models[0]['label'] ?? null);
                         $availableModels = collect($models)->pluck('label')->filter(fn($label) => $label !== $modelA)->values()->all();
@@ -196,6 +198,7 @@
     </section>
 
     {{-- Vote script --}}
+    {{-- ! Why are you using javascript to execute a submitvote? --}}
     <script>
         function submitVote(selected) {
             const modelA = document.getElementById('model_a_select').value;
