@@ -9,11 +9,6 @@ use App\Models\ModelUseCaseScore;
 
 class ScoreController extends Controller
 {
-    /**
-     * Toon het AB-test formulier.
-     *
-     * @return \Illuminate\View\View
-     */
     public function showABTest()
     {
         $models = config('models.models');
@@ -21,13 +16,7 @@ class ScoreController extends Controller
 
         return view('ab-test', compact('models', 'useCases'));
     }
-
-    /**
-     * Verwerk een stem van de gebruiker.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
+    
     public function vote(Request $request)
     {
         $validated = $request->validate([
@@ -65,53 +54,5 @@ class ScoreController extends Controller
         return redirect('/')
             ->withInput($validated)
             ->with('success', 'Stem opgeslagen!');
-    }
-
-
-
-    /**
-     * Toon het overzicht van de scores in een grafiek.
-     *
-     * @return \Illuminate\View\View
-     */
-    public function showChart()
-    {
-        // Solution
-        // AiModel::where('name', config('models.models.*.label'))->get();
-        // UseCase::where('name', config('models.use_cases.*'))->get();
-
-        //! Here you get all the models within the config file
-        $models = config('models.models');
-        $useCases = config('models.use_cases');
-
-        // Haal alle scores op inclusief relaties
-        $allScores = ModelUseCaseScore::with(['model', 'useCase'])->get();
-
-        $grouped = [];
-
-        //! Then you loop through all the models
-        foreach ($models as $modelConfig) {
-
-            //! You get the label and then get the AiModel by that label
-            $label = $modelConfig['label'];
-            $model = AiModel::where('name', $label)->first();
-
-            foreach ($useCases as $useCaseName) {
-                $useCase = UseCase::where('name', $useCaseName)->first();
-
-                if ($model && $useCase) {
-                    // Vind score voor combinatie model/use case
-                    $score = $allScores->firstWhere(function ($item) use ($model, $useCase) {
-                        return $item->model_id === $model->id && $item->use_case_id === $useCase->id;
-                    });
-
-                    $grouped[$label][$useCaseName] = $score ? $score->score : 0;
-                } else {
-                    $grouped[$label][$useCaseName] = 0;
-                }
-            }
-        }
-
-        return view('chart', compact('models', 'useCases', 'grouped'));
     }
 }

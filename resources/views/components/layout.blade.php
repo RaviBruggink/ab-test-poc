@@ -6,12 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Moonly A/B Test POC</title>
 
-  <!-- External Styles & Scripts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
   <script src="https://unpkg.com/alpinejs" defer></script>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/highcharts-more.js"></script>
+  <script src="https://code.highcharts.com/modules/xrange.js"></script>
+  <script src="https://code.highcharts.com/modules/exporting.js"></script>
+  <script src="https://code.highcharts.com/modules/accessibility.js"></script>
 
   <style>
     body {
@@ -25,47 +29,11 @@
 <body class="bg-white text-gray-900 flex flex-row min-h-screen">
 
   <!-- Sidebar -->
-<!-- !Try making an component of the navigation links, maybe also a seperate component for large svg's. So you will keep your code clean and readable -->
   <aside class="bg-slate-50 w-64 flex flex-col justify-between h-[100vh] border-r text-md sticky top-0">
     <div class="p-6 flex flex-col gap-8 h-full">
       <!-- Logo & Version -->
       <div class="flex items-center gap-2">
-        <svg width="20" height="20" viewBox="0 0 22 23" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <mask id="mask0_1610_861" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="22" height="23">
-            <path d="M11 22.5C17.0751 22.5 22 17.5751 22 11.5C22 5.42487 17.0751 0.5 11 0.5C4.92487 0.5 0 5.42487 0 11.5C0 17.5751 4.92487 22.5 11 22.5Z" fill="#D9D9D9"/>
-            </mask>
-            <g mask="url(#mask0_1610_861)">
-            <path d="M11 22.5C17.0751 22.5 22 17.5751 22 11.5C22 5.42487 17.0751 0.5 11 0.5C4.92487 0.5 0 5.42487 0 11.5C0 17.5751 4.92487 22.5 11 22.5Z" fill="url(#paint0_radial_1610_861)"/>
-            <path d="M11 22.5C17.0751 22.5 22 17.5751 22 11.5C22 5.42487 17.0751 0.5 11 0.5C4.92487 0.5 0 5.42487 0 11.5C0 17.5751 4.92487 22.5 11 22.5Z" fill="url(#paint1_radial_1610_861)"/>
-            <path d="M11 22.5C17.0751 22.5 22 17.5751 22 11.5C22 5.42487 17.0751 0.5 11 0.5C4.92487 0.5 0 5.42487 0 11.5C0 17.5751 4.92487 22.5 11 22.5Z" fill="url(#paint2_radial_1610_861)"/>
-            <g filter="url(#filter0_f_1610_861)">
-            <path d="M10.098 22.456C16.161 22.456 21.076 17.541 21.076 11.478C21.076 5.41502 16.161 0.5 10.098 0.5C4.03502 0.5 -0.880001 5.41502 -0.880001 11.478C-0.880001 17.541 4.03502 22.456 10.098 22.456Z" fill="url(#paint3_linear_1610_861)" fill-opacity="0.6"/>
-            </g>
-            </g>
-            <defs>
-            <filter id="filter0_f_1610_861" x="-500.88" y="-499.5" width="1021.96" height="1021.96" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
-            <feGaussianBlur stdDeviation="250" result="effect1_foregroundBlur_1610_861"/>
-            </filter>
-            <radialGradient id="paint0_radial_1610_861" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(12.496 9.08) rotate(114.341) scale(11.1556)">
-            <stop stop-color="#2DB1FB"/>
-            <stop offset="1" stop-color="#FE6ABA"/>
-            </radialGradient>
-            <radialGradient id="paint1_radial_1610_861" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(5.434 6.506) rotate(56.3847) scale(14.0278)">
-            <stop stop-color="#5709FA"/>
-            <stop offset="1" stop-color="white" stop-opacity="0"/>
-            </radialGradient>
-            <radialGradient id="paint2_radial_1610_861" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(18.502 5.802) rotate(135.22) scale(8.08936)">
-            <stop stop-color="white"/>
-            <stop offset="1" stop-color="white" stop-opacity="0"/>
-            </radialGradient>
-            <linearGradient id="paint3_linear_1610_861" x1="13.046" y1="3.646" x2="7.04" y2="16.692" gradientUnits="userSpaceOnUse">
-            <stop stop-color="white" stop-opacity="0.6"/>
-            <stop offset="1" stop-color="white" stop-opacity="0"/>
-            </linearGradient>
-            </defs>
-            </svg>
+        <x-logo class="inline-block"/>
         <span class="font-semibold text-gray-900">AURORA</span>
         <span class="text-gray-400 text-sm">v1.7.3</span>
       </div>
