@@ -1,4 +1,10 @@
 <x-layout>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/xrange.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    
     <div class="relative text-sm">
         <!-- Colorblind mode toggle button -->
         <button id="toggleColorblindMode" aria-label="Toggle Colorblind Mode"
@@ -66,10 +72,8 @@
 
         <!-- Chart container -->
         <div class="flex justify-end">
-            <div id="modelChartContainer" class="w-full" 
-            data-models='@json($models)'
-            data-scores='@json($grouped)'
-            data-usecases='@json($useCases)'>
+            <div id="modelChartContainer" class="w-full" data-models='@json($models)' data-scores='@json($grouped)'
+                data-usecases='@json($useCases)'>
             </div>
         </div>
     </div>

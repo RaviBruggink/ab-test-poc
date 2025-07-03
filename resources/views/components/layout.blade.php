@@ -1,3 +1,4 @@
+<!-- resources/views/layouts/app.blade.php -->
 <!DOCTYPE html>
 <html lang="nl">
 
@@ -5,17 +6,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Moonly A/B Test POC</title>
-
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-  <script src="https://unpkg.com/alpinejs" defer></script>
-  <script src="https://code.highcharts.com/highcharts.js"></script>
-  <script src="https://code.highcharts.com/highcharts-more.js"></script>
-  <script src="https://code.highcharts.com/modules/xrange.js"></script>
-  <script src="https://code.highcharts.com/modules/exporting.js"></script>
-  <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+  @include('partials.scripts')
 
   <style>
     body {
@@ -27,9 +20,8 @@
 </head>
 
 <body class="bg-white text-gray-900 flex flex-row min-h-screen">
-
   <!-- Sidebar -->
-  <aside class="bg-slate-50 w-64 flex flex-col justify-between h-[100vh] border-r text-md sticky top-0">
+  <aside class="bg-slate-50 w-64 flex flex-col justify-between h-screen border-r sticky top-0 text-md">
     <div class="p-6 flex flex-col gap-8 h-full">
       <!-- Logo & Version -->
       <div class="flex items-center gap-2">
@@ -41,77 +33,77 @@
       <!-- Main Navigation -->
       <nav class="flex flex-col h-full justify-between pb-14" aria-label="Main navigation">
         <a href="/distributions" class="flex items-center gap-3 text-gray-700 hover:text-black">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house-icon lucide-house"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-           Overview
+          <x-icons.house-icon class="inline-block"/>
+          Overview
         </a>
 
         <div class="flex flex-col gap-3">
           <a href="#" class="flex items-center gap-3 text-gray-700 hover:text-black">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle-icon lucide-message-circle"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+            <x-icons.message-circle-icon class="inline-block"/>
             Chat
           </a>
           <a href="/chart" class="flex items-center gap-3 text-gray-700 hover:text-black">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-database-icon lucide-database"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+            <x-icons.database-icon class="inline-block"/>
             Models
           </a>
           <a href="#" class="flex items-center gap-3 text-gray-700 hover:text-black">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-vault-icon lucide-vault"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/><path d="m7.9 7.9 2.7 2.7"/><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/><path d="m13.4 10.6 2.7-2.7"/><circle cx="7.5" cy="16.5" r=".5" fill="currentColor"/><path d="m7.9 16.1 2.7-2.7"/><circle cx="16.5" cy="16.5" r=".5" fill="currentColor"/><path d="m13.4 13.4 2.7 2.7"/><circle cx="12" cy="12" r="2"/></svg>
+            <x-icons.vault-icon class="inline-block"/>
             Overview
           </a>
         </div>
 
         <div class="flex flex-col gap-3">
           <a href="#" class="flex items-center gap-3 text-gray-700 hover:text-black">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-graduation-cap-icon lucide-graduation-cap"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg>
+            <x-icons.graduation-cap-icon class="inline-block"/>
             Academy
           </a>
           <a href="#" class="flex items-center gap-3 text-gray-700 hover:text-black">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users-icon lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg>
+            <x-icons.users-icon class="inline-block"/>
             Team
           </a>
           <a href="#" class="flex items-center gap-3 text-gray-700 hover:text-black">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-icon lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <x-icons.user-icon class="inline-block"/>
             Account
           </a>
         </div>
 
         <style>
-            .pinned-link img {
-              filter: grayscale(100%);
-              transition: filter 0.3s ease;
-            }
-
-            .pinned-link:hover img {
-              filter: grayscale(0%);
-            }
-          </style>
+          .pinned-link img {
+            filter: grayscale(100%);
+            transition: filter 0.3s ease;
+          }
+          .pinned-link:hover img {
+            filter: grayscale(0%);
+          }
+        </style>
 
         <!-- Pinned Models -->
         <div>
-            <h2 class="text-xs text-gray-500 font-semibold uppercase mb-3 tracking-wide">Pinned models</h2>
-            <a href="#" class="pinned-link flex items-center gap-3 text-gray-700 hover:text-black pb-2 text-sm">
-              <img src="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250" alt="Claude Sonnet" class="rounded-md w-6 h-6" />
-              Claude Sonnet
-            </a>
-            <a href="#" class="pinned-link flex items-center gap-3 text-gray-700 hover:text-black text-sm">
-              <img src="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250" alt="Montferland" class="rounded-md w-6 h-6" />
-              Montferland
-            </a>
-          </div>
+          <h2 class="text-xs text-gray-500 font-semibold uppercase mb-3 tracking-wide">Pinned models</h2>
+          <a href="#" class="pinned-link flex items-center gap-3 text-gray-700 hover:text-black pb-2 text-sm">
+            <img src="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250" alt="Claude Sonnet" class="rounded-md w-6 h-6" />
+            Claude Sonnet
+          </a>
+          <a href="#" class="pinned-link flex items-center gap-3 text-gray-700 hover:text-black text-sm">
+            <img src="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250" alt="Montferland" class="rounded-md w-6 h-6" />
+            Montferland
+          </a>
+        </div>
 
         <!-- Superuser Section -->
         <div>
           <h2 class="text-xs text-gray-500 font-semibold uppercase mb-3 tracking-wide">Superuser</h2>
           <a href="#" class="flex items-center gap-3 text-gray-700 hover:text-black">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-database-icon lucide-database"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+            <x-icons.database-icon class="inline-block"/>
             Models
           </a>
           <a href="#" class="flex items-center gap-3 text-gray-700 hover:text-black">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-split-icon lucide-split"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3"/><path d="m15 9 6-6"/></svg>
+            <x-icons.split-icon class="inline-block"/>
             Distributions
           </a>
           <a href="#" class="flex items-center gap-3 text-gray-700 hover:text-black">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building-icon lucide-building"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg>rganisations
+            <x-icons.building-icon class="inline-block"/>
+            Organisations
           </a>
         </div>
       </nav>
@@ -119,9 +111,15 @@
 
     <!-- Footer Controls -->
     <div class="border-t px-10 py-4 flex justify-between text-gray-500">
-      <button aria-label="Settings"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings-icon lucide-settings"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></button>
-      <button aria-label="Toggle Theme"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun-icon lucide-sun"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg></button>
-      <button aria-label="Log out"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-out-icon lucide-log-out"><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></svg></button>
+      <button aria-label="Settings">
+        <x-icons.settings-icon class="inline-block"/>
+      </button>
+      <button aria-label="Toggle Theme">
+        <x-icons.sun-icon class="inline-block"/>
+      </button>
+      <button aria-label="Log out">
+        <x-icons.log-out-icon class="inline-block"/>
+      </button>
     </div>
   </aside>
 
@@ -131,7 +129,6 @@
       {{ $slot }}
     </section>
   </main>
-
 </body>
 
 </html>
